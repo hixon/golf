@@ -68,3 +68,12 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+## Project specific instructions to run app
+Add a .env file under project (where package.json lives)
+Add the following variables (with your league's info)
+```
+REACT_APP_USERNAME=#########
+REACT_APP_PASSWORD=#########
+```
