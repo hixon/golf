@@ -39,6 +39,7 @@ function App() {
   const [ players, setPlayers ] = useState([])
   const [ schedule, setSchedule ] = useState([])
   const [ courseInfo, setCourseInfo ] = useState([])
+  const [ st, setST ] = useState("")
   const [ leagueDate, setLeagueDate ] = ("")
   //login initially to get an access token
   //token will be used later for other web api calls
@@ -47,6 +48,7 @@ function App() {
       .authenticate()
       
       .then(atoken => {
+        setST(atoken)
         console.log("getting players:", atoken)
         golftracker
         .players(atoken)
@@ -63,6 +65,17 @@ function App() {
       })
       
   }, [])
+
+  useEffect(() =>{
+    if(schedule.length > 0){
+      golftracker
+      .courseinfo(st, schedule[0].Course.CourseNumber)
+      .then(response => {
+        console.log("course info: ", response.data)
+        setCourseInfo(response.data)
+      })
+    }
+  }, [schedule])
 
   const getCurrentWeekSide = () => {
     const currDate = new Date()

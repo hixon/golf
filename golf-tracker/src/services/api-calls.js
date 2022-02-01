@@ -37,7 +37,7 @@ const sched = (token) => {
 }
 
 const courseinfo = (token, courseNumber) => {
-    return axios.get(baseurl + schedule + `/GetCourse?st=${token}&courseNumber=${courseNumber}`)
+    return axios.get(baseurl + course + `/GetCourse?st=${token}&courseNumber=${courseNumber}`)
 }
 
 export default{
