@@ -7,6 +7,7 @@ const login = '/Login'
 const player = '/Player'
 const schedule = '/Schedule'
 const score = '/Score'
+const course = '/Course'
 
 //login creds
 const currdate = new Date()
@@ -35,8 +36,13 @@ const sched = (token) => {
     return axios.get(baseurl + schedule + `/GetSchedule?st=${token}`)
 }
 
+const courseinfo = (token, courseNumber) => {
+    return axios.get(baseurl + schedule + `/GetCourse?st=${token}&courseNumber=${courseNumber}`)
+}
+
 export default{
     authenticate, 
     players, 
-    sched
+    sched, 
+    courseinfo
 }
