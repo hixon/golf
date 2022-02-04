@@ -41,6 +41,8 @@ function App() {
   const [ courseInfo, setCourseInfo ] = useState([])
   const [ st, setST ] = useState("")
   const [ leagueDate, setLeagueDate ] = ("")
+  let golferinfo = []
+  let holeinfo = []
   //login initially to get an access token
   //token will be used later for other web api calls
   useEffect(() => {
@@ -73,13 +75,66 @@ function App() {
       .then(response => {
         console.log("course info: ", response.data)
         setCourseInfo(response.data)
+        //.then(SetGolfObject())
+        //SetGolfObject()
       })
     }
   }, [schedule])
 
+  useEffect(() => {
+    SetGolfObject()
+  }, [courseInfo])
+
+
   const getCurrentWeekSide = () => {
     const currDate = new Date()
     currDate.getDay()
+  }
+
+  const SetCourseObject = () => {
+    let coursedata = {}
+
+    let Holes = {}
+    courseInfo.TeeBoxes[0].Holes.map(course => {
+        coursedata.HoleNumber = course.HoleNumber
+        coursedata.Handicap = course.RelativeHandicap18
+        coursedata.SideHandicap = course.RelativeHandicap9
+        coursedata.push(Holes)
+    })
+      holeinfo.push(coursedata)
+      console.log(holeinfo)
+  }
+
+  const SetGolfObject = () => {
+    let currdetails = {};
+    players.map(player => {
+      currdetails.Name = player.FirstNameLastName
+      currdetails.Hcp = player.CurrentHandicap
+      currdetails.Strokes = 0
+      currdetails.TotalScore = 0
+      currdetails.TotalPoints = 0
+
+      let holeinfo = []
+      courseInfo.TeeBoxes[0].Holes.map((course, index) => {
+        //per hole details
+        if(index < 9){
+          let hole = {}
+          hole.Hole = course.HoleNumber
+          hole.Score = 0
+          hole.HScore = 0
+          hole.Points = 0
+          hole.Swings = 0
+          holeinfo.push(hole)
+        }
+      })
+
+      currdetails.Holes = holeinfo
+      golferinfo.push(currdetails)
+      console.log(golferinfo)
+      
+      //clear the object again
+      currdetails = {}
+    })
   }
 
   const getLeagueDate = () => {
@@ -113,4 +168,3 @@ function App() {
 }
 
 export default App;
-
