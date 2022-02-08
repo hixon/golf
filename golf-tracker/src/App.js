@@ -3,29 +3,31 @@ import React, { useState, useEffect } from 'react'
 import './App.css';
 
 const LeagueDate = (props) => {
-  const [ selectedweek, setSelectedWeek ] = useState("")
-  const getLeagueDate = (weeks) => {
-    let previous = ""
-    const today = new Date()
-    const alldates = weeks.filter(item => {
-      const curr = new Date(item.MatchDate)
-      if(curr === today){
-        return item.MatchDate
-      }
-      else if (today > previous && today < curr){
-        return item.MatchDate
-      }
-      else{
-        previous = curr
-      }
-    })
-  }
+  //const [ dates, setDates ] = useState([])
 
   if (props.weeks != undefined && props.weeks.length > 0){
     console.log(props.weeks)
-    const side = props.weeks[0].CourseSide == 1? "Front" : "Back"
+
+    const getLeagueDate = (dates) => {
+      let previous = ""
+      const today = new Date()
+      return dates.filter(item => {
+        const curr = new Date(item.MatchDate)
+        if(curr === today){
+          return item.MatchDate
+        }
+        else if (today > previous && today < curr){
+          return item.MatchDate
+        }
+        else{
+          previous = curr
+        }
+      })
+    }
+
+    const side = getLeagueDate(props.weeks)[0].CourseSide == 1? "Front" : "Back"
     return (
-    <h3>Golf League 2022 : { props.weeks[0].MatchDate } Playing: { side } 9</h3>
+    <h3>Golf League 2022 : { getLeagueDate(props.weeks)[0].MatchDate } Playing: { side } 9</h3>
     )
   }
   else {
