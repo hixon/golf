@@ -40,4 +40,10 @@
 /* STYLES FOR SPECIFIC PAGE */
 .scoreinput{
   width: 3em;
+  text-align: center;
+}
+
+:disabled{
+  background-color: #f0f0f0;
+  color: #000000;
 }

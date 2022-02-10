@@ -42,6 +42,28 @@ const LeagueDate = (props) => {
 }
 const WeeklyGolfers = (props) => {
   console.log("11 called weekly golfer component")
+
+  const handleScoreChange = (event) => {
+    const rowId = event.target.id
+    const player_index = parseInt(rowId.split('-')[0])
+    const hole_index = parseInt(rowId.split('-')[1]) - 1
+    console.log("changing score: ", event.target.value)
+    props.stats[player_index].Holes[hole_index].Score = parseInt(event.target.value)
+
+    //also want to update the total score
+    props.stats[player_index].Strokes = props.stats[player_index].Holes.reduce(function (prev, curr) {
+      return prev + curr.Strokes
+    })
+    //setSearch(event.target.value)
+  }
+
+  const GetPar = (items) => {
+    items.reduce(function(previousValue, currentValue)
+    {
+      return previousValue + currentValue.Par
+    }, 0)
+  }
+
   if((props.people.length === undefined && props.stats.length === undefined) || (props.people.length > 0 && props.stats.length > 0)){
     let ParScore = 0
     //need to get the following working better based on side
@@ -58,6 +80,7 @@ const WeeklyGolfers = (props) => {
           </tr>
         </thead>
         <tbody>
+      
       { props.people.map(item => 
         <tr key={item.PlayerNumber}>
           <td><button>X</button></td>
@@ -70,10 +93,10 @@ const WeeklyGolfers = (props) => {
               {
                 return previousValue + currentValue.Par
               }, 0)
-              return <td key={index}><input type="number" className="scoreinput" hole={item.Holes[index].Hole} score={item.Holes[index].Score} placeholder={item.Holes[index].Par}></input></td>
+              return <td key={index}><input id={index+"-"+item.Holes[index].Hole} type="number" onChange={(e) => handleScoreChange(e)} className="scoreinput" hole={item.Holes[index].Hole} score={item.Holes[index].Score} placeholder={item.Holes[index].Par}></input></td>
             }
           })}
-          <td><input className="scoreinput" score={item.Strokes} placeholder={ParScore}></input></td>          
+          <td><input className="scoreinput" score={item.Strokes} placeholder={ParScore} disabled="disabled"></input></td>          
         </tr>
       )}  
       </tbody>
@@ -85,7 +108,6 @@ const WeeklyGolfers = (props) => {
       <div></div>
     )
   }
-  
 }
 
 function App() {
@@ -140,27 +162,6 @@ function App() {
         setCourseInfo(response.data)
       })
     }
-    
-    /*
-    //set the week
-    let previous = ""
-    const today = new Date()
-    const alldates = schedule.filter(item => {
-      const curr = new Date(item.MatchDate)
-      if(curr === today){
-        return item.MatchDate
-      }
-      else if (today > previous && today < curr){
-        return item.MatchDate
-      }
-      else{
-        previous = curr
-      }
-    })
-
-    setLeagueDate(alldates[0])
-    */
-
   }, [st, schedule])
   
   useEffect(() => {
@@ -168,6 +169,7 @@ function App() {
     let currdetails = {};
     let parscore = 0;
     players.map(player => {
+      currdetails.PlayerNumber = player.PlayerNumber
       currdetails.Name = player.FirstNameLastName
       currdetails.Hcp = player.CurrentHandicap
       currdetails.Strokes = 0
