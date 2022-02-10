@@ -27,7 +27,11 @@ const LeagueDate = (props) => {
 
     const side = getLeagueDate(props.weeks)[0].CourseSide == 1? "Front" : "Back"
     return (
-    <h3>Golf League 2022 : { getLeagueDate(props.weeks)[0].MatchDate } Playing: { side } 9</h3>
+      <div>
+        <p>WWGC 2022</p>
+        <p>Week { getLeagueDate(props.weeks)[0].MatchDate } </p>
+        <p>Playing: { side } 9 </p>
+      </div>
     )
   }
   else {
@@ -39,6 +43,7 @@ const LeagueDate = (props) => {
 const WeeklyGolfers = (props) => {
   console.log("11 called weekly golfer component")
   if((props.people.length === undefined && props.stats.length === undefined) || (props.people.length > 0 && props.stats.length > 0)){
+    let ParScore = 0
     //need to get the following working better based on side
     //also dynamically show the holes based on the side
     return (
@@ -58,12 +63,17 @@ const WeeklyGolfers = (props) => {
           <td><button>X</button></td>
           <td>{item.FirstNameLastName}</td>
           <td>{item.CurrentHandicap}</td>
-          { props.stats.map((item, index) => {
-            if(index < 9){
-              return <td key={index}><input type="number" className="scoreinput" hole={item.Hole} score={item.Score} placeholder="4"></input></td>
+          { props.stats.map((item, index) => {            
+            if(index < 9){              
+              ParScore = 0
+              ParScore = item.Holes.reduce(function(previousValue, currentValue)
+              {
+                return previousValue + currentValue.Par
+              }, 0)
+              return <td key={index}><input type="number" className="scoreinput" hole={item.Holes[index].Hole} score={item.Holes[index].Score} placeholder={item.Holes[index].Par}></input></td>
             }
           })}
-          <td><input className="scoreinput" score={item.Strokes}></input></td>
+          <td><input className="scoreinput" score={item.Strokes} placeholder={ParScore}></input></td>          
         </tr>
       )}  
       </tbody>
@@ -156,6 +166,7 @@ function App() {
   useEffect(() => {
     console.log("10 set golf object")
     let currdetails = {};
+    let parscore = 0;
     players.map(player => {
       currdetails.Name = player.FirstNameLastName
       currdetails.Hcp = player.CurrentHandicap
@@ -173,10 +184,12 @@ function App() {
           hole.HScore = 0
           hole.Points = 0
           hole.Swings = 0
+          hole.Par = course.Par
+
           holeinfo.push(hole)
         }
       })
-
+      currdetails.ParScore = parscore;
       currdetails.Holes = holeinfo
       golferinfo.push(currdetails)
       
@@ -252,6 +265,7 @@ function App() {
           hole.HScore = 0
           hole.Points = 0
           hole.Swings = 0
+          hole.Par = course.Par
           holeinfo.push(hole)
         }
       })
