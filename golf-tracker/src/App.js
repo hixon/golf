@@ -2,6 +2,44 @@ import golftracker from './services/api-calls'
 import React, { useState, useEffect } from 'react'
 import './App.css';
 
+const TestRow = () => {
+  const [ rowdata, setRowData ] = useState({
+    Name: "Ryan", 
+    Hcp: 6.22, 
+    Holes: [{
+      Hole: 1, 
+      Par: 4, 
+      Strokes: 0
+    }, 
+    {
+      Hole: 2, 
+      Par: 4, 
+      Strokes: 0
+    }], 
+    Strokes: 0, 
+    Points: 0, 
+  });
+
+  const handleChange = (event) => {
+    const hole = {...rowdata.Holes[0].Strokes};
+    const strokes = parseInt(event.target.value);
+    setRowData({...rowdata, [event.target.id]: strokes});
+    //setRowData(...rowdata, {rowdata.Holes[0].Strokes = parseInt(event.target.value)});
+    console.log("Changed to: ", event.target.value);
+  }
+
+  return(
+    <table>
+      <tr>
+  <     td>{rowdata.Name}</td>
+        <td>{rowdata.Hcp}</td>
+        <td><input id="Strokes" onChange={(e) => handleChange(e)}></input></td>
+        <td><input id="Strokes" onChange={(e) => handleChange(e)}></input></td>
+      </tr>
+    </table>
+  )
+}
+
 const LeagueDate = (props) => {
   //const [ dates, setDates ] = useState([])
 
@@ -41,30 +79,32 @@ const LeagueDate = (props) => {
   }
 }
 const WeeklyGolfers = (props) => {
-  console.log("11 called weekly golfer component")
+  const [scoreinfo, setScoreInfo] = useState();
 
   const handleScoreChange = (event) => {
-    const rowId = event.target.id
-    const player_index = parseInt(rowId.split('-')[0])
-    const hole_index = parseInt(rowId.split('-')[1]) - 1
-    console.log("changing score: ", event.target.value)
-    props.stats[player_index].Holes[hole_index].Score = parseInt(event.target.value)
-
+    const rowId = event.target.id;
+    const player_index = parseInt(rowId.split('-')[0]);
+    const hole_index = parseInt(rowId.split('-')[1]) - 1;
+    console.log("changing score: ", event.target.value);
+    //props.stats[player_index].Holes[hole_index].Score = parseInt(event.target.value);
+    setScoreInfo(...scoreinfo, scoreinfo[player_index].Holes[hole_index].Score = parseInt(event.target.value), 
+    scoreinfo[player_index].Holes[hole_index].Strokes = props.stats[player_index].Holes.reduce(function (prev, curr) {
+      return prev + curr.Strokes;
+    }));
     //also want to update the total score
-    props.stats[player_index].Strokes = props.stats[player_index].Holes.reduce(function (prev, curr) {
-      return prev + curr.Strokes
-    })
-    //setSearch(event.target.value)
+    //props.stats[player_index].Strokes = props.stats[player_index].Holes.reduce(function (prev, curr) {
+    //  return prev + curr.Strokes;
+    //});
   }
 
-  const GetPar = (items) => {
-    items.reduce(function(previousValue, currentValue)
-    {
-      return previousValue + currentValue.Par
-    }, 0)
-  }
+  useEffect(() => {
+    setScoreInfo(props.stats)
+  }, [props.stats])
 
-  if((props.people.length === undefined && props.stats.length === undefined) || (props.people.length > 0 && props.stats.length > 0)){
+  console.log("stats set: ", scoreinfo);
+
+  if((props.people.length === undefined && props.stats.length === undefined) || 
+    (props.people.length > 0 && props.stats.length > 0)){
     let ParScore = 0
     //need to get the following working better based on side
     //also dynamically show the holes based on the side
@@ -81,23 +121,22 @@ const WeeklyGolfers = (props) => {
         </thead>
         <tbody>
       
-      { props.people.map(item => 
+      { props.stats.map(item => 
         <tr key={item.PlayerNumber}>
-          <td><button>X</button></td>
-          <td>{item.FirstNameLastName}</td>
-          <td>{item.CurrentHandicap}</td>
-          { props.stats.map((item, index) => {            
-            if(index < 9){              
-              ParScore = 0
-              ParScore = item.Holes.reduce(function(previousValue, currentValue)
-              {
-                return previousValue + currentValue.Par
-              }, 0)
-              return <td key={index}><input id={index+"-"+item.Holes[index].Hole} type="number" onChange={(e) => handleScoreChange(e)} className="scoreinput" hole={item.Holes[index].Hole} score={item.Holes[index].Score} placeholder={item.Holes[index].Par}></input></td>
-            }
-          })}
-          <td><input className="scoreinput" score={item.Strokes} placeholder={ParScore} disabled="disabled"></input></td>          
-        </tr>
+        <td><button>X</button></td>
+        <td>{item.Name}</td>
+        <td>{item.Hcp}</td>
+        { item.Holes.map((item, index) => {            
+          if(index < 9){              
+            return <td key={index}><input id={index+"-"+item.Hole} type="number" onChange={(e) => handleScoreChange(e)} className="scoreinput" hole={item.Hole} score={item.Score} placeholder={item.Par}></input></td>
+          }
+        })}
+        <td><input className="scoreinput" score={item.Strokes} placeholder={item.Holes.reduce(function(previousValue, currentValue)
+          {
+            return previousValue + currentValue.Par
+          }, 0)} disabled="disabled"></input></td>          
+      </tr>
+        
       )}  
       </tbody>
       </table>
@@ -305,7 +344,7 @@ function App() {
          <ul>
            {schedule.map((item, index) => <li key={index}>{item.CourseSide} {item.MatchDate}</li>)}
          </ul>
-        
+        <TestRow />
       </header>
     </div>
   );
