@@ -2,7 +2,10 @@ import golftracker from './services/api-calls'
 import React, { useState, useEffect } from 'react'
 import './App.css';
 
-const TestRow = () => {
+const TestRow = (props) => {
+  //REDUX should be needed for this portion so that we can maintain the state of the golfer information
+  //see if we can update a value in the props.stats
+  console.log(props.stats)
   const [ rowdata, setRowData ] = useState({
     Name: "Ryan", 
     Hcp: 6.22, 
@@ -19,6 +22,17 @@ const TestRow = () => {
     Strokes: 0, 
     Points: 0, 
   });
+
+  if(props.stats != undefined && props.stats.length > 0){
+    //update something here
+    //convert to JSON object JSON.parse()
+    //update value
+    //setGolfData(JSON.stringify())
+    const currinfo = JSON.parse(props.stats);
+    console.log("currinfo as json string: ", currinfo);
+
+    props.stats = JSON.stringify(currinfo);
+  }
 
   const handleChange = (event) => {
     const hole = {...rowdata.Holes[0].Strokes};
@@ -91,10 +105,34 @@ const WeeklyGolfers = (props) => {
     scoreinfo[player_index].Holes[hole_index].Strokes = props.stats[player_index].Holes.reduce(function (prev, curr) {
       return prev + curr.Strokes;
     }));
-    //also want to update the total score
-    //props.stats[player_index].Strokes = props.stats[player_index].Holes.reduce(function (prev, curr) {
-    //  return prev + curr.Strokes;
-    //});
+    
+    //1. save inputted score to JSON object
+    //2. loop through current player's holes and if score > 0 (added a score)
+    //  const roundedhcp = Hcp.round()
+    //  if(hole.Relative9 <= roundedhcp) 
+    //  { 
+    //    HScore = Score - 1 //need to do this with hcp's > 9 though too 
+    //    // need to loop this for if you get 3/4 strokes on each hole
+    //    if(roundedHcp > 9) //only give two strokes for valid holes{
+    //      const smallerhcp = roundedHcp - 9
+    //      if (hole.Relative9 <= smallerHcp){
+    //        HScore = HScore - 1
+    //      }   
+    //    }
+    //  }
+    //3. items.Holes.reduce(to get total score and total points)
+  }
+
+  const handleGolferRemove = (event) => {
+    console.log("remove: ", event.target.id);
+
+    //set the golfer's Active flag back to 0
+    scoreinfo.filter(item => { 
+      if (item.Name == event.target.id){
+        item.Active = 0;
+        //set this componenet
+      } 
+    })
   }
 
   useEffect(() => {
@@ -123,7 +161,7 @@ const WeeklyGolfers = (props) => {
       
       { props.stats.map(item => 
         <tr key={item.PlayerNumber}>
-        <td><button>X</button></td>
+        <td><button id={item.Name} onClick={(e) => handleGolferRemove(e)} >X</button></td>
         <td>{item.Name}</td>
         <td>{item.Hcp}</td>
         { item.Holes.map((item, index) => {            
@@ -135,8 +173,7 @@ const WeeklyGolfers = (props) => {
           {
             return previousValue + currentValue.Par
           }, 0)} disabled="disabled"></input></td>          
-      </tr>
-        
+        </tr>
       )}  
       </tbody>
       </table>
@@ -214,6 +251,7 @@ function App() {
       currdetails.Strokes = 0
       currdetails.TotalScore = 0
       currdetails.TotalPoints = 0
+      currdetails.Active = 1
 
       let holeinfo = []
       courseInfo.TeeBoxes[0].Holes.map((course, index) => {
@@ -237,8 +275,9 @@ function App() {
       //clear the object again
       currdetails = {}
     })
-    console.log(golferinfo)
-    setGolfers(golferinfo)
+    console.log(JSON.stringify(golferinfo))
+    //setGolfers(JSON.stringify(golferinfo))
+    setGolfers(golferinfo);
   }, [courseInfo])
   
 
@@ -344,7 +383,7 @@ function App() {
          <ul>
            {schedule.map((item, index) => <li key={index}>{item.CourseSide} {item.MatchDate}</li>)}
          </ul>
-        <TestRow />
+        
       </header>
     </div>
   );
