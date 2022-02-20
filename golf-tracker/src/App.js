@@ -12,12 +12,12 @@ const TestRow = (props) => {
     Holes: [{
       Hole: 1, 
       Par: 4, 
-      Strokes: 0
+      Strokes: 2
     }, 
     {
       Hole: 2, 
       Par: 4, 
-      Strokes: 0
+      Strokes: 3
     }], 
     Strokes: 0, 
     Points: 0, 
@@ -28,29 +28,69 @@ const TestRow = (props) => {
     //convert to JSON object JSON.parse()
     //update value
     //setGolfData(JSON.stringify())
-    const currinfo = JSON.parse(props.stats);
-    console.log("currinfo as json string: ", currinfo);
+    //const currinfo = JSON.parse(props.stats);
+    //console.log("currinfo as json string: ", currinfo);
 
-    props.stats = JSON.stringify(currinfo);
+    //props.stats = JSON.stringify(currinfo);
   }
 
-  const handleChange = (event) => {
-    const hole = {...rowdata.Holes[0].Strokes};
+  /*
+  const handleScoreChange = (event) => {
+    //copy state
+    const newState = rowdata;
+
+    //update value
+    const hole = newState.Holes[0].Strokes;
     const strokes = parseInt(event.target.value);
-    setRowData({...rowdata, [event.target.id]: strokes});
+    newState.Holes[event.target.id - 1].Strokes = strokes;
+    newState.Strokes = newState.Holes.reduce(
+      (prev, curr) => prev + curr.Strokes, 0
+    )
+    //const updatedvalue = {rowdata: strokes};
+    //setRowData({...rowdata, [event.target.id]: strokes});
+    //setRowData({...rowdata, updatedvalue});
     //setRowData(...rowdata, {rowdata.Holes[0].Strokes = parseInt(event.target.value)});
     console.log("Changed to: ", event.target.value);
+
+    //push state back
+    setRowData(newState)
+    console.log('new state: ', rowdata);
   }
+  */
 
   return(
     <table>
-      <tr>
-  <     td>{rowdata.Name}</td>
-        <td>{rowdata.Hcp}</td>
-        <td><input id="Strokes" onChange={(e) => handleChange(e)}></input></td>
-        <td><input id="Strokes" onChange={(e) => handleChange(e)}></input></td>
-      </tr>
+      <PlayerRow playerstats={props.stats} handleChange={props.handleChange} />
     </table>
+  )
+}
+
+const PlayerRow = (props) => {
+  if(props.playerstats != undefined && props.playerstats.length > 0){
+    console.log("playerrow strokes: ", props.playerstats.Strokes);
+    return (
+      <tr>
+          <td>{props.playerstats[0].Name}</td>
+          <td>{props.playerstats[0].Hcp}</td>
+          {props.playerstats[0].Holes.map((item, index) =>
+            <HoleInfo key={index} details={item} handleChange={props.handleChange} /> 
+          )}
+          <td>Sum:{props.playerstats[0].Strokes}</td>
+        </tr>
+    )
+  }
+  else{
+    return(<div></div>)
+  }
+}
+
+const HoleInfo = (props) => {
+const handleChange = (event) => {
+  console.log(event.target.value)
+}
+
+  return (
+    <td><input id={props.details.Hole} className="scoreinput" placeholder={props.details.Strokes} onChange={props.handleChange}></input></td>
   )
 }
 
@@ -263,6 +303,8 @@ function App() {
           hole.HScore = 0
           hole.Points = 0
           hole.Swings = 0
+          hole.RelativeHcp9 = course.RelativeDifficulty9
+          hole.RelativeHcp18 = course.RelativeDifficulty18
           hole.Par = course.Par
 
           holeinfo.push(hole)
@@ -373,6 +415,36 @@ function App() {
     }
   }
 
+  const handleScoreUpdate = (event) => {
+    console.log('score changed: ', event.target.value);
+
+    //copy state
+    const newState = golfers;
+
+    //update value
+    const hole = newState[0].Holes[0].Strokes;
+    const strokes = parseInt(event.target.value);
+    //log new score
+    newState[0].Holes[event.target.id - 1].Strokes = strokes;
+
+    //update weighted score and points
+    //newState[0].Holes[event.target.id - 1].HScore = newState[0].Holes[event.target.id].RelativeHcp <= newState[0].Hcp? newState[0].Holes[event.target.id - 1].Score - 1: newState[0].Holes[event.target.id - 1].Score;
+    //newState[0].Holes[event.target.id - 1].Points = 
+
+    //update total strokes for round
+    newState[0].Strokes = newState[0].Holes.reduce(
+      (prev, curr) => prev + curr.Strokes, 0
+    )
+    
+    console.log("Changed to: ", event.target.value);
+
+    //push state back
+    //setRowData(newState)
+    console.log('new state: ', golfers);
+
+    setGolfers(newState);
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -384,6 +456,7 @@ function App() {
            {schedule.map((item, index) => <li key={index}>{item.CourseSide} {item.MatchDate}</li>)}
          </ul>
         
+        <TestRow stats={golfers} handleChange={(e) => handleScoreUpdate(e)}/>
       </header>
     </div>
   );
