@@ -235,6 +235,7 @@ function App() {
   const [ st, setST ] = useState("")
   const [ leagueDate, setLeagueDate ] = useState("")
   const [ golfers, setGolfers ] = useState([])
+  const [ courseside, setCourseSide ] = useState("")
   let golferinfo = []
   let holeinfo = []
 
@@ -270,6 +271,8 @@ function App() {
   useEffect(() =>{
     console.log("7 get course info")
     if(schedule.length > 0){
+      const courseside = getSideFromDate(schedule)[0].CourseSide == 1? "Front" : "Back"
+      setCourseSide(courseside)
       console.log("8 course info actually")
       golftracker
       .courseinfo(st, schedule[0].Course.CourseNumber)
@@ -284,6 +287,7 @@ function App() {
     console.log("10 set golf object")
     let currdetails = {};
     let parscore = 0;
+
     players.map(player => {
       currdetails.PlayerNumber = player.PlayerNumber
       currdetails.Name = player.FirstNameLastName
@@ -296,18 +300,37 @@ function App() {
       let holeinfo = []
       courseInfo.TeeBoxes[0].Holes.map((course, index) => {
         //per hole details
-        if(index < 9){
-          let hole = {}
-          hole.Hole = course.HoleNumber
-          hole.Score = 0
-          hole.HScore = 0
-          hole.Points = 0
-          hole.Swings = 0
-          hole.RelativeHcp9 = course.RelativeDifficulty9
-          hole.RelativeHcp18 = course.RelativeDifficulty18
-          hole.Par = course.Par
-
-          holeinfo.push(hole)
+        if (courseside === "Front"){
+          //front nine
+          if(index < 9){
+            let hole = {}
+            hole.Hole = course.HoleNumber
+            hole.Score = 0
+            hole.HScore = 0
+            hole.Points = 0
+            hole.Swings = 0
+            hole.RelativeHcp9 = course.RelativeDifficulty9
+            hole.RelativeHcp18 = course.RelativeDifficulty18
+            hole.Par = course.Par
+  
+            holeinfo.push(hole)
+          }
+        }
+        else if (courseside === "Back"){
+          //back nine
+          if(index >= 9){
+            let hole = {}
+            hole.Hole = course.HoleNumber
+            hole.Score = 0
+            hole.HScore = 0
+            hole.Points = 0
+            hole.Swings = 0
+            hole.RelativeHcp9 = course.RelativeDifficulty9
+            hole.RelativeHcp18 = course.RelativeDifficulty18
+            hole.Par = course.Par
+  
+            holeinfo.push(hole)
+          }
         }
       })
       currdetails.ParScore = parscore;
@@ -322,6 +345,22 @@ function App() {
     setGolfers(golferinfo);
   }, [courseInfo])
   
+  const getSideFromDate = (dates) => {
+    let previous = ""
+    const today = new Date()
+    return dates.filter(item => {
+      const curr = new Date(item.MatchDate)
+      if(curr === today){
+        return item.MatchDate
+      }
+      else if (today > previous && today < curr){
+        return item.MatchDate
+      }
+      else{
+        previous = curr
+      }
+    })
+  }
 
   /*
   if(courseInfo.length > 0){
