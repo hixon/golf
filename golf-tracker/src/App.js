@@ -368,13 +368,13 @@ function App() {
   }
   */
 
+  /*
   const GetCurrentWeekSide = () => {
     const TUESDAY = 2
 
-    /*
-    loop through weeks and see if anything matches today if so return just that date
-    otherwise keep the previous date and see where it changes
-    */
+    //loop through weeks and see if anything matches today if so return just that date
+    //otherwise keep the previous date and see where it changes
+    
     let previous = ""
     const today = new Date()
     const alldates = schedule.MatchDate.filter(item => {
@@ -392,7 +392,9 @@ function App() {
 
     setLeagueDate(alldates[0])
   }
+  */
 
+  /*
   const SetCourseObject = () => {
     let coursedata = {}
 
@@ -406,7 +408,9 @@ function App() {
       holeinfo.push(coursedata)
       console.log(holeinfo)
   }
+  */
 
+  /*
   const SetGolfObject = () => {
     let currdetails = {};
     players.map(player => {
@@ -439,7 +443,9 @@ function App() {
     })
     console.log(golferinfo)
   }
+  */
 
+  /*
   const getLeagueDate = () => {
     const currDay = new Date()
     const TUESDAY = 2
@@ -453,6 +459,7 @@ function App() {
       }
     }
   }
+  */
 
   const handleScoreUpdate = (event) => {
     console.log('score changed: ', event.target.value);
