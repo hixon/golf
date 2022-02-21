@@ -186,14 +186,16 @@ const WeeklyGolfers = (props) => {
     let ParScore = 0
     //need to get the following working better based on side
     //also dynamically show the holes based on the side
+    //for the hole number we can just loop through one persons Holes array and display the Hole
     return (
       <table>
         <thead>
           <tr>
-            <th></th><th>Name</th><th>Handicap</th>
-            <th>1</th><th>2</th><th>3</th>
-            <th>4</th><th>5</th><th>6</th>
-            <th>7</th><th>8</th><th>9</th>
+          <th></th><th>Name</th><th>Handicap</th>
+            {props.stats[0].Holes.map((item, index) => {
+              return <th key={index}>{item.Hole}</th>
+            }
+            )}
             <th>Total</th>
           </tr>
         </thead>
@@ -362,104 +364,69 @@ function App() {
     })
   }
 
-  /*
-  if(courseInfo.length > 0){
-    setGolfers(SetGolfObject())
+  const AddSkin = () => {
+    //this will be used to keep track of all skins, if there are any
   }
-  */
 
-  /*
-  const GetCurrentWeekSide = () => {
-    const TUESDAY = 2
+  //this will be used in a bit once we can get all the skins and team data in
+  const calculateMoney = () => {
+    //used to calculate how much money we should have
+    //how much goes to the club
+    //how much goes towards each skin
+    //how much goes towards blind teams
 
-    //loop through weeks and see if anything matches today if so return just that date
-    //otherwise keep the previous date and see where it changes
-    
-    let previous = ""
-    const today = new Date()
-    const alldates = schedule.MatchDate.filter(item => {
-      const curr = new Date(item)
-      if(curr === today){
-        return item
+    //gets list of all Active golfers
+    const totalNumberOfGolfers = golfers.reduce(function (total, curr) {
+      if (curr.Active === 1) {
+        total += 1;
       }
-      else if (today > previous && today < curr){
-        return item
-      }
-      else{
-        previous = curr
-      }
-    })
 
-    setLeagueDate(alldates[0])
+      return total;
+    });
+
+    //total money = number of golfers * 25 (15 for golf 10 for gambling)
+    const totalMoney = totalNumberOfGolfers * 25;
+    const toTerry = totalNumberOfGolfers * 15;
+    const toSkins = totalNumberOfGolfers * 5;
+    const toTeams = totalNumberOfGolfers * 5;
+
+    //money per skin
+    //const perSkin = toSkins/NumberOfSkins
+
+    //team payouts
+    const firstTeam = toTeams * .6;
+    const secondTeam = toTeams * .4;
   }
-  */
 
-  /*
-  const SetCourseObject = () => {
-    let coursedata = {}
-
-    let Holes = {}
-    courseInfo.TeeBoxes[0].Holes.map(course => {
-        coursedata.HoleNumber = course.HoleNumber
-        coursedata.Handicap = course.RelativeHandicap18
-        coursedata.SideHandicap = course.RelativeHandicap9
-        coursedata.push(Holes)
-    })
-      holeinfo.push(coursedata)
-      console.log(holeinfo)
-  }
-  */
-
-  /*
-  const SetGolfObject = () => {
-    let currdetails = {};
-    players.map(player => {
-      currdetails.Name = player.FirstNameLastName
-      currdetails.Hcp = player.CurrentHandicap
-      currdetails.Strokes = 0
-      currdetails.TotalScore = 0
-      currdetails.TotalPoints = 0
-
-      let holeinfo = []
-      courseInfo.TeeBoxes[0].Holes.map((course, index) => {
-        //per hole details
-        if(index < 9){
-          let hole = {}
-          hole.Hole = course.HoleNumber
-          hole.Score = 0
-          hole.HScore = 0
-          hole.Points = 0
-          hole.Swings = 0
-          hole.Par = course.Par
-          holeinfo.push(hole)
-        }
-      })
-
-      currdetails.Holes = holeinfo
-      golferinfo.push(currdetails)
-      
-      //clear the object again
-      currdetails = {}
-    })
-    console.log(golferinfo)
-  }
-  */
-
-  /*
-  const getLeagueDate = () => {
-    const currDay = new Date()
-    const TUESDAY = 2
-    const WEEK = 7
-    let leagueDate = ""
-
-    if(currDay.getDay() != TUESDAY){
-      //here we need to do some math to get the right league date
-      if(currDay.getDay() > TUESDAY){
-        setLeagueDate(currDay.getMonth() + "/" + currDay.getDate() - currDay.getDay() - TUESDAY) 
-      }
+  const getPointsFromScore = (golfScore) => {
+    //1 on 5
+    if (golfScore === -4 ){
+      return 32;
+    }
+    //albatross
+    else if (golfScore === -3 ){
+      return 16;
+    }
+    //eagle
+    else if (golfScore === -2 ){
+      return 8;
+    }
+    //birdie
+    else if (golfScore === -1 ){
+      return 4;
+    }
+    //par
+    else if(golfScore === 0){
+      return 2;
+    }
+    //bogey
+    else if(golfScore === 1){
+      return 1;
+    }
+    else{
+      return 0;
     }
   }
-  */
 
   const handleScoreUpdate = (event) => {
     console.log('score changed: ', event.target.value);
@@ -470,12 +437,23 @@ function App() {
     //update value
     const hole = newState[0].Holes[0].Strokes;
     const strokes = parseInt(event.target.value);
+    const currentHole = newState[0].Holes[event.target.id % 9 - 1];
     //log new score
-    newState[0].Holes[event.target.id - 1].Strokes = strokes;
+    currentHole.Strokes = strokes;
 
     //update weighted score and points
-    //newState[0].Holes[event.target.id - 1].HScore = newState[0].Holes[event.target.id].RelativeHcp <= newState[0].Hcp? newState[0].Holes[event.target.id - 1].Score - 1: newState[0].Holes[event.target.id - 1].Score;
-    //newState[0].Holes[event.target.id - 1].Points = 
+    const hcpMultiplyer = parseInt(Math.round(newState[0].Hcp) / 9);
+    const hcpHoles = parseInt(newState[0].Hcp % 9);
+    if(currentHole.RelativeHcp9 <= hcpHoles){
+      currentHole.HScore = currentHole.Strokes - (1 + hcpMultiplyer);
+    }
+    else{
+      currentHole.HScore = currentHole.Strokes;
+    }
+
+    //gives back a golf number like -1 = birdie, -2 = eagle, 0 = par, 1 = bogey, etc...
+    const golfScore = currentHole.HScore - currentHole.Par;
+    currentHole.Points = getPointsFromScore(golfScore);
 
     //update total strokes for round
     newState[0].Strokes = newState[0].Holes.reduce(
