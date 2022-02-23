@@ -238,6 +238,7 @@ function App() {
   const [ leagueDate, setLeagueDate ] = useState("")
   const [ golfers, setGolfers ] = useState([])
   const [ courseside, setCourseSide ] = useState("")
+  const [ test, setTest ] = useState(0);
   let golferinfo = []
   let holeinfo = []
 
@@ -310,7 +311,7 @@ function App() {
             hole.Score = 0
             hole.HScore = 0
             hole.Points = 0
-            hole.Swings = 0
+            hole.Strokes = 0
             hole.RelativeHcp9 = course.RelativeDifficulty9
             hole.RelativeHcp18 = course.RelativeDifficulty18
             hole.Par = course.Par
@@ -437,7 +438,13 @@ function App() {
     //update value
     const hole = newState[0].Holes[0].Strokes;
     const strokes = parseInt(event.target.value);
-    const currentHole = newState[0].Holes[event.target.id % 9 - 1];
+    let currentHole = 0;
+    if(event.target.id > 9){
+      currentHole = newState[0].Holes[event.target.id % 9 - 1];
+    }
+    else{
+      currentHole = newState[0].Holes[event.target.id - 1];
+    }
     //log new score
     currentHole.Strokes = strokes;
 
@@ -466,6 +473,7 @@ function App() {
     //setRowData(newState)
     console.log('new state: ', golfers);
 
+    setTest(test + 1);
     setGolfers(newState);
   }
 
