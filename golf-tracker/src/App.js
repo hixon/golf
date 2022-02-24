@@ -75,7 +75,7 @@ const PlayerRow = (props) => {
           {props.playerstats[0].Holes.map((item, index) =>
             <HoleInfo key={index} details={item} handleChange={props.handleChange} /> 
           )}
-          <td>{props.playerstats[0].Strokes}<sub>{props.playerstats[0].TotalStrokes}</sub><sup>{props.playerstats[0].TotalPoints}</sup></td>
+          <td className="scoreTotals">{props.playerstats[0].Strokes}<sub>{props.playerstats[0].TotalStrokes}</sub><sup>{props.playerstats[0].TotalPoints}</sup></td>
         </tr>
     )
   }
@@ -437,30 +437,40 @@ function App() {
 
     //update value
     const hole = newState[0].Holes[0].Strokes;
-    const strokes = parseInt(event.target.value);
+    let strokes = 0;
+    if(parseInt(event.target.value) > 0){
+      strokes = parseInt(event.target.value);
+    }
     let currentHole = 0;
-    if(event.target.id > 9){
-      currentHole = newState[0].Holes[event.target.id % 9 - 1];
+      if(event.target.id > 9){
+        currentHole = newState[0].Holes[event.target.id % 9 - 1];
+      }
+      else{
+        currentHole = newState[0].Holes[event.target.id - 1];
+      }
+      //log new score
+      currentHole.Strokes = strokes;
+
+    if(strokes > 0){
+      //update weighted score and points
+      const hcpMultiplyer = parseInt(Math.round(newState[0].Hcp) / 9);
+      const hcpHoles = parseInt(newState[0].Hcp % 9);
+      if(currentHole.RelativeHcp9 <= hcpHoles){
+        currentHole.HScore = currentHole.Strokes - (1 + hcpMultiplyer);
+      }
+      else{
+        currentHole.HScore = currentHole.Strokes;
+      }
+
+      //gives back a golf number like -1 = birdie, -2 = eagle, 0 = par, 1 = bogey, etc...
+      const golfScore = currentHole.HScore - currentHole.Par;
+      currentHole.Points = getPointsFromScore(golfScore);
     }
     else{
-      currentHole = newState[0].Holes[event.target.id - 1];
+      //if input is not a number or 0 reset everything so we dont get nan
+      currentHole.HScore = strokes;
+      currentHole.Points = strokes; 
     }
-    //log new score
-    currentHole.Strokes = strokes;
-
-    //update weighted score and points
-    const hcpMultiplyer = parseInt(Math.round(newState[0].Hcp) / 9);
-    const hcpHoles = parseInt(newState[0].Hcp % 9);
-    if(currentHole.RelativeHcp9 <= hcpHoles){
-      currentHole.HScore = currentHole.Strokes - (1 + hcpMultiplyer);
-    }
-    else{
-      currentHole.HScore = currentHole.Strokes;
-    }
-
-    //gives back a golf number like -1 = birdie, -2 = eagle, 0 = par, 1 = bogey, etc...
-    const golfScore = currentHole.HScore - currentHole.Par;
-    currentHole.Points = getPointsFromScore(golfScore);
 
     //update total strokes for round
     newState[0].Strokes = newState[0].Holes.reduce(

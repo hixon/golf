@@ -42,6 +42,7 @@
   width: 2em;
   text-align: center;
   border: none;
+  font-size: 1.25em;
 }
 
 :disabled{
@@ -56,4 +57,9 @@ sub, sup {
 .inputfield{
   background: white;
   color: black;
+}
+
+.scoreTotals{
+  background: black;
+  width: 4em;
 }
