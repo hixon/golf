@@ -75,7 +75,7 @@ const PlayerRow = (props) => {
           {props.playerstats[0].Holes.map((item, index) =>
             <HoleInfo key={index} details={item} handleChange={props.handleChange} /> 
           )}
-          <td>Sum:{props.playerstats[0].Strokes}</td>
+          <td>{props.playerstats[0].Strokes}<sub>{props.playerstats[0].TotalStrokes}</sub><sup>{props.playerstats[0].TotalPoints}</sup></td>
         </tr>
     )
   }
@@ -90,7 +90,7 @@ const handleChange = (event) => {
 }
 
   return (
-    <td><input id={props.details.Hole} className="scoreinput" placeholder={props.details.Strokes} onChange={props.handleChange}></input></td>
+  <td className="inputfield"><input id={props.details.Hole} className="scoreinput" placeholder={props.details.Strokes} onChange={props.handleChange}></input><sub>{props.details.HScore}</sub><sup>{props.details.Points}</sup></td>
   )
 }
 
@@ -465,6 +465,16 @@ function App() {
     //update total strokes for round
     newState[0].Strokes = newState[0].Holes.reduce(
       (prev, curr) => prev + curr.Strokes, 0
+    )
+
+    //update total points for round
+    newState[0].TotalPoints = newState[0].Holes.reduce(
+      (prev, curr) => prev + curr.Points, 0
+    )
+
+    //update total HScore for round
+    newState[0].TotalStrokes = newState[0].Holes.reduce(
+      (prev, curr) => prev + curr.HScore, 0
     )
     
     console.log("Changed to: ", event.target.value);

@@ -39,11 +39,21 @@
 
 /* STYLES FOR SPECIFIC PAGE */
 .scoreinput{
-  width: 5em;
+  width: 2em;
   text-align: center;
+  border: none;
 }
 
 :disabled{
   background-color: #f0f0f0;
   color: #000000;
+}
+
+sub, sup {
+  font-size: 0.7em;
+}
+
+.inputfield{
+  background: white;
+  color: black;
 }
