@@ -63,9 +63,7 @@ const TestRow = (props) => {
       <thead>
         <InputHeader headerinfo={props.stats} />
       </thead>
-      <tbody>
         <PlayerRow playerstats={props.stats} handleChange={props.handleChange} />
-      </tbody>
     </table>
   )
 }
@@ -90,20 +88,38 @@ const InputHeader = (props) => {
   }
 }
 
+/*
+<tr>
+    <td><button>X</button></td>
+    <td>{props.playerstats[0].Name}</td>
+    <td>{Math.round(props.playerstats[0].Hcp)}</td>
+    {props.playerstats[0].Holes.map((item, index) =>
+      <HoleInfo key={index} details={item} handleChange={props.handleChange} /> 
+    )}
+    <td className="scoreTotals">{props.playerstats[0].Strokes}<sub>{props.playerstats[0].HStrokes}</sub><sup>{props.playerstats[0].TotalPoints}</sup></td>
+    <td><input className="scoreinput"></input></td>
+</tr>
+*/
+
 const PlayerRow = (props) => {
   if(props.playerstats != undefined && props.playerstats.length > 0){
     console.log("playerrow strokes: ", props.playerstats.Strokes);
-    return (
-      <tr>
-          <td><button>X</button></td>
-          <td>{props.playerstats[0].Name}</td>
-          <td>{Math.round(props.playerstats[0].Hcp)}</td>
-          {props.playerstats[0].Holes.map((item, index) =>
-            <HoleInfo key={index} details={item} handleChange={props.handleChange} /> 
-          )}
-          <td className="scoreTotals">{props.playerstats[0].Strokes}<sub>{props.playerstats[0].HStrokes}</sub><sup>{props.playerstats[0].TotalPoints}</sup></td>
-          <td><input className="scoreinput"></input></td>
-        </tr>
+    return ( 
+       <tbody>
+         { props.playerstats.map(player => 
+          <tr>
+            <td><button>X</button></td>
+            <td>{player.Name}</td>
+            <td>{Math.round(player.Hcp)}</td>
+            {player.Holes.map((item, index) =>
+              <HoleInfo key={index} player={player.PlayerNumber} details={item} handleChange={props.handleChange} /> 
+            )}
+            <td className="scoreTotals">{player.Strokes}<sub>{player.HStrokes}</sub><sup>{player.TotalPoints}</sup></td>
+            <td><input className="scoreinput"></input></td>
+          </tr> 
+         )
+         }
+       </tbody>
     )
   }
   else{
@@ -117,7 +133,7 @@ const handleChange = (event) => {
 }
 
   return (
-  <td className="inputfield"><input id={props.details.Hole} className="scoreinput" placeholder={props.details.Par} onChange={props.handleChange}></input><sub>{props.details.HScore}</sub><sup>{props.details.Points}</sup></td>
+  <td className="inputfield"><input id={props.player + '-' + props.details.Hole} className="scoreinput" placeholder={props.details.Par} onChange={props.handleChange}></input><sub>{props.details.HScore}</sub><sup>{props.details.Points}</sup></td>
   )
 }
 
@@ -458,30 +474,34 @@ function App() {
 
   const handleScoreUpdate = (event) => {
     console.log('score changed: ', event.target.value);
+    const playerId = event.target.id.split('-')[0];
+    const holeNum = event.target.id.split('-')[1];
 
     //copy state
     const newState = golfers;
 
+    const playerdetails = newState.filter(item => item.PlayerNumber == playerId)[0];
+
     //update value
-    const hole = newState[0].Holes[0].Strokes;
+    //const hole = playerdetails.Holes[holeNum].Strokes;
     let strokes = 0;
     if(parseInt(event.target.value) > 0){
       strokes = parseInt(event.target.value);
     }
     let currentHole = 0;
-      if(event.target.id > 9){
-        currentHole = newState[0].Holes[event.target.id % 9 - 1];
+      if(holeNum > 9){
+        currentHole = playerdetails.Holes[holeNum % 9 - 1];
       }
       else{
-        currentHole = newState[0].Holes[event.target.id - 1];
+        currentHole = playerdetails.Holes[holeNum - 1];
       }
       //log new score
       currentHole.Strokes = strokes;
 
     if(strokes > 0){
       //update weighted score and points
-      const hcpMultiplyer = parseInt(Math.round(newState[0].Hcp) / 9);
-      const hcpHoles = parseInt(newState[0].Hcp % 9);
+      const hcpMultiplyer = parseInt(Math.round(playerdetails.Hcp) / 9);
+      const hcpHoles = parseInt(playerdetails.Hcp % 9);
       if(currentHole.RelativeHcp9 <= hcpHoles){
         currentHole.HScore = currentHole.Strokes - (1 + hcpMultiplyer);
       }
@@ -500,17 +520,17 @@ function App() {
     }
 
     //update total strokes for round
-    newState[0].Strokes = newState[0].Holes.reduce(
+    playerdetails.Strokes = playerdetails.Holes.reduce(
       (prev, curr) => prev + curr.Strokes, 0
     )
 
     //update total points for round
-    newState[0].TotalPoints = newState[0].Holes.reduce(
+    playerdetails.TotalPoints = playerdetails.Holes.reduce(
       (prev, curr) => prev + curr.Points, 0
     )
 
     //update total HScore for round
-    newState[0].HStrokes = newState[0].Holes.reduce(
+    playerdetails.HStrokes = playerdetails.Holes.reduce(
       (prev, curr) => prev + curr.HScore, 0
     )
     
