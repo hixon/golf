@@ -60,9 +60,34 @@ const TestRow = (props) => {
 
   return(
     <table>
-      <PlayerRow playerstats={props.stats} handleChange={props.handleChange} />
+      <thead>
+        <InputHeader headerinfo={props.stats} />
+      </thead>
+      <tbody>
+        <PlayerRow playerstats={props.stats} handleChange={props.handleChange} />
+      </tbody>
     </table>
   )
+}
+
+const InputHeader = (props) => {
+  if(props.headerinfo != undefined && props.headerinfo.length > 0){
+    return(
+      <tr>
+          <th></th><th>Name</th><th>Handicap</th>
+            {props.headerinfo[0].Holes.map((item, index) => {
+              return <th key={index}>{item.Hole}</th>
+            }
+            )}
+          <th>Total</th><th>Team #</th>
+        </tr>
+    )
+  }
+  else{
+    return(
+      <div></div>
+    )
+  }
 }
 
 const PlayerRow = (props) => {
@@ -70,12 +95,14 @@ const PlayerRow = (props) => {
     console.log("playerrow strokes: ", props.playerstats.Strokes);
     return (
       <tr>
+          <td><button>X</button></td>
           <td>{props.playerstats[0].Name}</td>
-          <td>{props.playerstats[0].Hcp}</td>
+          <td>{Math.round(props.playerstats[0].Hcp)}</td>
           {props.playerstats[0].Holes.map((item, index) =>
             <HoleInfo key={index} details={item} handleChange={props.handleChange} /> 
           )}
-          <td className="scoreTotals">{props.playerstats[0].Strokes}<sub>{props.playerstats[0].TotalStrokes}</sub><sup>{props.playerstats[0].TotalPoints}</sup></td>
+          <td className="scoreTotals">{props.playerstats[0].Strokes}<sub>{props.playerstats[0].HStrokes}</sub><sup>{props.playerstats[0].TotalPoints}</sup></td>
+          <td><input className="scoreinput"></input></td>
         </tr>
     )
   }
@@ -90,7 +117,7 @@ const handleChange = (event) => {
 }
 
   return (
-  <td className="inputfield"><input id={props.details.Hole} className="scoreinput" placeholder={props.details.Strokes} onChange={props.handleChange}></input><sub>{props.details.HScore}</sub><sup>{props.details.Points}</sup></td>
+  <td className="inputfield"><input id={props.details.Hole} className="scoreinput" placeholder={props.details.Par} onChange={props.handleChange}></input><sub>{props.details.HScore}</sub><sup>{props.details.Points}</sup></td>
   )
 }
 
@@ -205,7 +232,7 @@ const WeeklyGolfers = (props) => {
         <tr key={item.PlayerNumber}>
         <td><button id={item.Name} onClick={(e) => handleGolferRemove(e)} >X</button></td>
         <td>{item.Name}</td>
-        <td>{item.Hcp}</td>
+        <td>{Math.round(item.Hcp)}</td>
         { item.Holes.map((item, index) => {            
           if(index < 9){              
             return <td key={index}><input id={index+"-"+item.Hole} type="number" onChange={(e) => handleScoreChange(e)} className="scoreinput" hole={item.Hole} score={item.Score} placeholder={item.Par}></input></td>
@@ -296,7 +323,7 @@ function App() {
       currdetails.Name = player.FirstNameLastName
       currdetails.Hcp = player.CurrentHandicap
       currdetails.Strokes = 0
-      currdetails.TotalScore = 0
+      currdetails.HStrokes = 0
       currdetails.TotalPoints = 0
       currdetails.Active = 1
 
@@ -483,7 +510,7 @@ function App() {
     )
 
     //update total HScore for round
-    newState[0].TotalStrokes = newState[0].Holes.reduce(
+    newState[0].HStrokes = newState[0].Holes.reduce(
       (prev, curr) => prev + curr.HScore, 0
     )
     
