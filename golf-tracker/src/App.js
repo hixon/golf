@@ -2,68 +2,35 @@ import golftracker from './services/api-calls'
 import React, { useState, useEffect } from 'react'
 import './App.css';
 
+const GolfersToAdd = (props) => {
+  if (props.stats != undefined && props.stats.length > 0){
+    const inactiveplayers = props.stats.filter(item => item.Active == 0);
+    return (
+      <select onChange={props.handleChange}>
+        <option>(Choose One)</option>
+        {inactiveplayers.map(item => {
+          return <option id={item.PlayerNumber}>{item.Name}</option>
+        }
+       )}
+      </select>
+    )
+  }
+  else{
+    return(<div></div>)
+  }
+}
+
 const TestRow = (props) => {
   //REDUX should be needed for this portion so that we can maintain the state of the golfer information
   //see if we can update a value in the props.stats
   console.log(props.stats)
-  const [ rowdata, setRowData ] = useState({
-    Name: "Ryan", 
-    Hcp: 6.22, 
-    Holes: [{
-      Hole: 1, 
-      Par: 4, 
-      Strokes: 2
-    }, 
-    {
-      Hole: 2, 
-      Par: 4, 
-      Strokes: 3
-    }], 
-    Strokes: 0, 
-    Points: 0, 
-  });
-
-  if(props.stats != undefined && props.stats.length > 0){
-    //update something here
-    //convert to JSON object JSON.parse()
-    //update value
-    //setGolfData(JSON.stringify())
-    //const currinfo = JSON.parse(props.stats);
-    //console.log("currinfo as json string: ", currinfo);
-
-    //props.stats = JSON.stringify(currinfo);
-  }
-
-  /*
-  const handleScoreChange = (event) => {
-    //copy state
-    const newState = rowdata;
-
-    //update value
-    const hole = newState.Holes[0].Strokes;
-    const strokes = parseInt(event.target.value);
-    newState.Holes[event.target.id - 1].Strokes = strokes;
-    newState.Strokes = newState.Holes.reduce(
-      (prev, curr) => prev + curr.Strokes, 0
-    )
-    //const updatedvalue = {rowdata: strokes};
-    //setRowData({...rowdata, [event.target.id]: strokes});
-    //setRowData({...rowdata, updatedvalue});
-    //setRowData(...rowdata, {rowdata.Holes[0].Strokes = parseInt(event.target.value)});
-    console.log("Changed to: ", event.target.value);
-
-    //push state back
-    setRowData(newState)
-    console.log('new state: ', rowdata);
-  }
-  */
 
   return(
     <table>
       <thead>
         <InputHeader headerinfo={props.stats} />
       </thead>
-        <PlayerRow playerstats={props.stats} handleChange={props.handleChange} />
+        <PlayerRow playerstats={props.stats} handleClick={props.handleClick} handleChange={props.handleChange} />
     </table>
   )
 }
@@ -77,7 +44,7 @@ const InputHeader = (props) => {
               return <th key={index}>{item.Hole}</th>
             }
             )}
-          <th>Total</th><th>Team #</th>
+          <th>Total<sub>hcp</sub><sup>pts</sup></th><th>Team #</th>
         </tr>
     )
   }
@@ -104,22 +71,23 @@ const InputHeader = (props) => {
 const PlayerRow = (props) => {
   if(props.playerstats != undefined && props.playerstats.length > 0){
     console.log("playerrow strokes: ", props.playerstats.Strokes);
+    const activeplayers = props.playerstats.filter(item => item.Active == 1)
     return ( 
-       <tbody>
-         { props.playerstats.map(player => 
-          <tr>
-            <td><button>X</button></td>
-            <td>{player.Name}</td>
-            <td>{Math.round(player.Hcp)}</td>
-            {player.Holes.map((item, index) =>
-              <HoleInfo key={index} player={player.PlayerNumber} details={item} handleChange={props.handleChange} /> 
-            )}
-            <td className="scoreTotals">{player.Strokes}<sub>{player.HStrokes}</sub><sup>{player.TotalPoints}</sup></td>
-            <td><input className="scoreinput"></input></td>
-          </tr> 
-         )
-         }
-       </tbody>
+      <tbody>
+      { activeplayers.map((player, index) => 
+       <tr key={index}>
+         <td><button id={player.PlayerNumber} onClick={props.handleClick}>X</button></td>
+         <td>{player.Name}</td>
+         <td>{Math.round(player.Hcp)}</td>
+         {player.Holes.map((item, index) =>
+           <HoleInfo key={index} player={player.PlayerNumber} details={item} handleChange={props.handleChange} /> 
+         )}
+         <td className="scoreTotals">{player.Strokes}<sub>{player.HStrokes}</sub><sup>{player.TotalPoints}</sup></td>
+         <td><input className="scoreinput"></input></td>
+       </tr> 
+      )
+      }
+    </tbody>
     )
   }
   else{
@@ -544,6 +512,36 @@ function App() {
     setGolfers(newState);
   }
 
+  const handlePlayerMove = (event) => {
+    const playerId = event.target.id;
+
+    //copy state
+    const newState = golfers;
+
+    //find golfer to flip active tag
+    const playerdetails = newState.filter(item => item.PlayerNumber == playerId)[0];
+    
+    playerdetails.Active = 0;  
+
+    setTest(test + 1);
+    setGolfers(newState);
+  }
+
+  const ReAddPlayer = (event) => {
+    const playerId = event.target[event.target.selectedIndex].id
+
+    //copy state
+    const newState = golfers;
+
+    //find golfer to flip active tag
+    const playerdetails = newState.filter(item => item.PlayerNumber == playerId)[0];
+    
+    playerdetails.Active = 1;  
+
+    setTest(test + 1);
+    setGolfers(newState);
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -555,7 +553,8 @@ function App() {
            {schedule.map((item, index) => <li key={index}>{item.CourseSide} {item.MatchDate}</li>)}
          </ul>
         
-        <TestRow stats={golfers} handleChange={(e) => handleScoreUpdate(e)}/>
+        <GolfersToAdd stats={golfers} handleChange={(e) => ReAddPlayer(e)} />
+        <TestRow stats={golfers} handleClick={(e) => handlePlayerMove(e)} handleChange={(e) => handleScoreUpdate(e)}/>
       </header>
     </div>
   );
