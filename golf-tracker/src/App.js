@@ -25,11 +25,11 @@ const Skins = (props) => {
       <div>
         <ul>
           <li>Number of golfers: {totalNumberOfGolfers}</li>
-          <li>Total money: {totalMoney}</li>
-          <li>$ to Terry: {toTerry}</li>
-          <li>$ to Teams: {toTeams}</li>
-          <li>1st: {firstTeam}</li>
-          <li>2nd: {secondTeam}</li>
+          <li>Total money: {totalMoney} ({totalNumberOfGolfers} * ${proshopMoney} + ${gamblingMoney})</li>
+          <li>$ to Terry: {toTerry} ({totalNumberOfGolfers} * ${proshopMoney})</li>
+          <li>$ to Teams: {toTeams} ({totalNumberOfGolfers} * ${gamblingMoney/2})</li>
+          <li>1st: {firstTeam} (60% of ${toTeams})</li>
+          <li>2nd: {secondTeam} (40% of ${toTeams})</li>
         </ul>
 
         Skins
