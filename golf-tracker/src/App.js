@@ -21,15 +21,49 @@ const Skins = (props) => {
     const firstTeam = toTeams * .6;
     const secondTeam = toTeams * .4;
 
+    const golfinfo = props.stats;
+
+    let SkinDetails = [];
+    golfinfo[0].Holes.filter((item, index) => {
+      const holeIndex = index;
+      let PerHoleSkins = []
+      let currScore = 999;
+      golfinfo.filter(golfer => {
+        if(golfer.Strokes > 0 && golfer.Active == 1){
+          //loop through golfers only if they have a score and are active
+          const HoleData = golfer.Holes[holeIndex];
+          if(HoleData.Strokes > 0){
+            if(HoleData.HScore < currScore){
+              const holeSkinInfo = {PlayerName: golfer.Name, PlayerId: golfer.PlayerNumber, HoleIndex: holeIndex, Hole: HoleData.Hole, Score: HoleData.Strokes, HScore: HoleData.HScore };
+              PerHoleSkins.push(holeSkinInfo);
+              currScore = HoleData.HScore;
+            }
+            else if (HoleData.HScore == currScore){
+              if(PerHoleSkins.length > 0){
+                PerHoleSkins.pop();
+              }
+            }
+          }
+        }
+      });
+
+      if(PerHoleSkins.length == 1){
+        SkinDetails.push(PerHoleSkins);
+        //setTest(test + 1);
+        //setSkinDetails(skindetails.concat(PerHoleSkins));
+      }
+    })
+    console.log("Skin Info: ", SkinDetails);
+
     return (
       <div>
         <ul>
           <li>Number of golfers: {totalNumberOfGolfers}</li>
-          <li>Total money: {totalMoney} ({totalNumberOfGolfers} * ${proshopMoney} + ${gamblingMoney})</li>
-          <li>$ to Terry: {toTerry} ({totalNumberOfGolfers} * ${proshopMoney})</li>
-          <li>$ to Teams: {toTeams} ({totalNumberOfGolfers} * ${gamblingMoney/2})</li>
-          <li>1st: {firstTeam} (60% of ${toTeams})</li>
-          <li>2nd: {secondTeam} (40% of ${toTeams})</li>
+          <li>Total money: ${totalMoney} ({totalNumberOfGolfers} * ${proshopMoney} + ${gamblingMoney})</li>
+          <li>$ to Terry: ${toTerry} ({totalNumberOfGolfers} * ${proshopMoney})</li>
+          <li>$ to Teams: ${toTeams} ({totalNumberOfGolfers} * ${gamblingMoney/2})</li>
+          <li>1st: ${firstTeam} (60% of ${toTeams})</li>
+          <li>2nd: ${secondTeam} (40% of ${toTeams})</li>
         </ul>
 
         Skins
@@ -42,7 +76,7 @@ const Skins = (props) => {
               <th>Net</th>
             </tr>
           </thead>          
-          <SkinScores skins={props.skin} />          
+          <SkinScores skins={SkinDetails} />          
         </table>
       </div>
     )
@@ -61,14 +95,8 @@ const SkinScores = (props) => {
     console.log("write skins:", props.skins);
     return(
       <tbody>
-        <tr>
-          <td>Test</td>
-          <td>99</td>
-          <td>9</td>
-          <td>9</td>
-        </tr>
       {props.skins.map(item => {
-        <tr>
+        return <tr>
           <td>{item[0].PlayerName}</td>
           <td>{item[0].Hole}</td>
           <td>{item[0].Score}</td>
@@ -473,7 +501,7 @@ function App() {
     //setRowData(newState)
     console.log('new state: ', golfers);
 
-    CheckSkins(newState);
+    //CheckSkins(newState);
 
     setTest(test + 1);
     setGolfers(newState);
@@ -543,7 +571,7 @@ function App() {
         //setSkinDetails(skindetails.concat(PerHoleSkins));
       }
     })
-    console.log("Skin Info: ", skindetails);
+    console.log("Skin Info: ", SkinDetails);
   }
 
   return (
@@ -552,7 +580,7 @@ function App() {
         <LeagueDate weeks={ schedule }></LeagueDate>
         <GolfersToAdd stats={golfers} handleChange={(e) => ReAddPlayer(e)} />
         <WeeklyGolfers stats={golfers} handleClick={(e) => handlePlayerMove(e)} handleChange={(e) => handleScoreUpdate(e)}/>
-        <Skins stats={golfers} skin={skindetails} />
+        <Skins stats={golfers} />
       </header>
     </div>
   );
