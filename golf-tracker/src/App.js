@@ -7,10 +7,12 @@ const Skins = (props) => {
     const totalNumberOfGolfers = props.stats.filter(item => item.Active == 1).length;
 
     //total money = number of golfers * 25 (15 for golf 10 for gambling)
-    const totalMoney = totalNumberOfGolfers * 25;
-    const toTerry = totalNumberOfGolfers * 20;
-    const toSkins = totalNumberOfGolfers * 5;
-    const toTeams = totalNumberOfGolfers * 5;
+    const proshopMoney = 20;
+    const gamblingMoney = 10;
+    const totalMoney = totalNumberOfGolfers * (proshopMoney + gamblingMoney);
+    const toTerry = totalNumberOfGolfers * proshopMoney;
+    const toSkins = totalNumberOfGolfers * (gamblingMoney / 2);
+    const toTeams = totalNumberOfGolfers * (gamblingMoney / 2);
 
     //money per skin
     //const perSkin = toSkins/NumberOfSkins
