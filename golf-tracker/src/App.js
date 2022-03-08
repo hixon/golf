@@ -2,11 +2,94 @@ import golftracker from './services/api-calls'
 import React, { useState, useEffect } from 'react'
 import './App.css';
 
+const Skins = (props) => {
+  if(props.stats != undefined && props.stats.length > 0){
+    const totalNumberOfGolfers = props.stats.filter(item => item.Active == 1).length;
+
+    //total money = number of golfers * 25 (15 for golf 10 for gambling)
+    const totalMoney = totalNumberOfGolfers * 25;
+    const toTerry = totalNumberOfGolfers * 20;
+    const toSkins = totalNumberOfGolfers * 5;
+    const toTeams = totalNumberOfGolfers * 5;
+
+    //money per skin
+    //const perSkin = toSkins/NumberOfSkins
+
+    //team payouts
+    const firstTeam = toTeams * .6;
+    const secondTeam = toTeams * .4;
+
+    return (
+      <div>
+        <ul>
+          <li>Number of golfers: {totalNumberOfGolfers}</li>
+          <li>Total money: {totalMoney}</li>
+          <li>$ to Terry: {toTerry}</li>
+          <li>$ to Teams: {toTeams}</li>
+          <li>1st: {firstTeam}</li>
+          <li>2nd: {secondTeam}</li>
+        </ul>
+
+        Skins
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Hole</th>
+              <th>Gross</th>
+              <th>Net</th>
+            </tr>
+          </thead>          
+          <SkinScores skins={props.skin} />          
+        </table>
+      </div>
+    )
+  }
+  else{
+    <div></div>
+  }
+
+  return (
+    <div></div>
+  )
+}
+
+const SkinScores = (props) => {
+  if (props.skins.length > 0 && props.skins != undefined){
+    console.log("write skins:", props.skins);
+    return(
+      <tbody>
+        <tr>
+          <td>Test</td>
+          <td>99</td>
+          <td>9</td>
+          <td>9</td>
+        </tr>
+      {props.skins.map(item => {
+        <tr>
+          <td>{item[0].PlayerName}</td>
+          <td>{item[0].Hole}</td>
+          <td>{item[0].Score}</td>
+          <td>{item[0].HScore}</td>
+        </tr>
+      }
+      )}
+      </tbody>
+    )
+  }
+  else{
+    return(
+      <>
+      </>
+    )
+  }
+}
+
 const GolfersToAdd = (props) => {
   if (props.stats != undefined && props.stats.length > 0){
     const inactiveplayers = props.stats.filter(item => item.Active == 0);
     return (
-      <select onChange={props.handleChange}>
+      <select onChange={props.handleChange}>test
         <option>(Choose One)</option>
         {inactiveplayers.map(item => {
           return <option id={item.PlayerNumber}>{item.Name}</option>
@@ -20,7 +103,7 @@ const GolfersToAdd = (props) => {
   }
 }
 
-const TestRow = (props) => {
+const WeeklyGolfers = (props) => {
   //REDUX should be needed for this portion so that we can maintain the state of the golfer information
   //see if we can update a value in the props.stats
   console.log(props.stats)
@@ -54,19 +137,6 @@ const InputHeader = (props) => {
     )
   }
 }
-
-/*
-<tr>
-    <td><button>X</button></td>
-    <td>{props.playerstats[0].Name}</td>
-    <td>{Math.round(props.playerstats[0].Hcp)}</td>
-    {props.playerstats[0].Holes.map((item, index) =>
-      <HoleInfo key={index} details={item} handleChange={props.handleChange} /> 
-    )}
-    <td className="scoreTotals">{props.playerstats[0].Strokes}<sub>{props.playerstats[0].HStrokes}</sub><sup>{props.playerstats[0].TotalPoints}</sup></td>
-    <td><input className="scoreinput"></input></td>
-</tr>
-*/
 
 const PlayerRow = (props) => {
   if(props.playerstats != undefined && props.playerstats.length > 0){
@@ -143,101 +213,6 @@ const LeagueDate = (props) => {
     )
   }
 }
-const WeeklyGolfers = (props) => {
-  const [scoreinfo, setScoreInfo] = useState();
-
-  const handleScoreChange = (event) => {
-    const rowId = event.target.id;
-    const player_index = parseInt(rowId.split('-')[0]);
-    const hole_index = parseInt(rowId.split('-')[1]) - 1;
-    console.log("changing score: ", event.target.value);
-    //props.stats[player_index].Holes[hole_index].Score = parseInt(event.target.value);
-    setScoreInfo(...scoreinfo, scoreinfo[player_index].Holes[hole_index].Score = parseInt(event.target.value), 
-    scoreinfo[player_index].Holes[hole_index].Strokes = props.stats[player_index].Holes.reduce(function (prev, curr) {
-      return prev + curr.Strokes;
-    }));
-    
-    //1. save inputted score to JSON object
-    //2. loop through current player's holes and if score > 0 (added a score)
-    //  const roundedhcp = Hcp.round()
-    //  if(hole.Relative9 <= roundedhcp) 
-    //  { 
-    //    HScore = Score - 1 //need to do this with hcp's > 9 though too 
-    //    // need to loop this for if you get 3/4 strokes on each hole
-    //    if(roundedHcp > 9) //only give two strokes for valid holes{
-    //      const smallerhcp = roundedHcp - 9
-    //      if (hole.Relative9 <= smallerHcp){
-    //        HScore = HScore - 1
-    //      }   
-    //    }
-    //  }
-    //3. items.Holes.reduce(to get total score and total points)
-  }
-
-  const handleGolferRemove = (event) => {
-    console.log("remove: ", event.target.id);
-
-    //set the golfer's Active flag back to 0
-    scoreinfo.filter(item => { 
-      if (item.Name == event.target.id){
-        item.Active = 0;
-        //set this componenet
-      } 
-    })
-  }
-
-  useEffect(() => {
-    setScoreInfo(props.stats)
-  }, [props.stats])
-
-  console.log("stats set: ", scoreinfo);
-
-  if((props.people.length === undefined && props.stats.length === undefined) || 
-    (props.people.length > 0 && props.stats.length > 0)){
-    let ParScore = 0
-    //need to get the following working better based on side
-    //also dynamically show the holes based on the side
-    //for the hole number we can just loop through one persons Holes array and display the Hole
-    return (
-      <table>
-        <thead>
-          <tr>
-          <th></th><th>Name</th><th>Handicap</th>
-            {props.stats[0].Holes.map((item, index) => {
-              return <th key={index}>{item.Hole}</th>
-            }
-            )}
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-      
-      { props.stats.map(item => 
-        <tr key={item.PlayerNumber}>
-        <td><button id={item.Name} onClick={(e) => handleGolferRemove(e)} >X</button></td>
-        <td>{item.Name}</td>
-        <td>{Math.round(item.Hcp)}</td>
-        { item.Holes.map((item, index) => {            
-          if(index < 9){              
-            return <td key={index}><input id={index+"-"+item.Hole} type="number" onChange={(e) => handleScoreChange(e)} className="scoreinput" hole={item.Hole} score={item.Score} placeholder={item.Par}></input></td>
-          }
-        })}
-        <td><input className="scoreinput" score={item.Strokes} placeholder={item.Holes.reduce(function(previousValue, currentValue)
-          {
-            return previousValue + currentValue.Par
-          }, 0)} disabled="disabled"></input></td>          
-        </tr>
-      )}  
-      </tbody>
-      </table>
-    )
-  }
-  else{
-    return(
-      <div></div>
-    )
-  }
-}
 
 function App() {
   //COURSE SIDES: 1 - FRONT, 2 - BACK
@@ -249,6 +224,7 @@ function App() {
   const [ leagueDate, setLeagueDate ] = useState("")
   const [ golfers, setGolfers ] = useState([])
   const [ courseside, setCourseSide ] = useState("")
+  const [ skindetails, setSkinDetails ] = useState([]);
   const [ test, setTest ] = useState(0);
   let golferinfo = []
   let holeinfo = []
@@ -326,6 +302,7 @@ function App() {
             hole.RelativeHcp9 = course.RelativeDifficulty9
             hole.RelativeHcp18 = course.RelativeDifficulty18
             hole.Par = course.Par
+            hole.Skin = 0
   
             holeinfo.push(hole)
           }
@@ -338,10 +315,11 @@ function App() {
             hole.Score = 0
             hole.HScore = 0
             hole.Points = 0
-            hole.Swings = 0
+            hole.Strokes = 0
             hole.RelativeHcp9 = course.RelativeDifficulty9
             hole.RelativeHcp18 = course.RelativeDifficulty18
             hole.Par = course.Par
+            hole.Skin = 0
   
             holeinfo.push(hole)
           }
@@ -378,36 +356,6 @@ function App() {
 
   const AddSkin = () => {
     //this will be used to keep track of all skins, if there are any
-  }
-
-  //this will be used in a bit once we can get all the skins and team data in
-  const calculateMoney = () => {
-    //used to calculate how much money we should have
-    //how much goes to the club
-    //how much goes towards each skin
-    //how much goes towards blind teams
-
-    //gets list of all Active golfers
-    const totalNumberOfGolfers = golfers.reduce(function (total, curr) {
-      if (curr.Active === 1) {
-        total += 1;
-      }
-
-      return total;
-    });
-
-    //total money = number of golfers * 25 (15 for golf 10 for gambling)
-    const totalMoney = totalNumberOfGolfers * 25;
-    const toTerry = totalNumberOfGolfers * 15;
-    const toSkins = totalNumberOfGolfers * 5;
-    const toTeams = totalNumberOfGolfers * 5;
-
-    //money per skin
-    //const perSkin = toSkins/NumberOfSkins
-
-    //team payouts
-    const firstTeam = toTeams * .6;
-    const secondTeam = toTeams * .4;
   }
 
   const getPointsFromScore = (golfScore) => {
@@ -447,8 +395,8 @@ function App() {
 
     //copy state
     const newState = golfers;
-
     const playerdetails = newState.filter(item => item.PlayerNumber == playerId)[0];
+    const playerHcp = parseInt(Math.round(playerdetails.Hcp));
 
     //update value
     //const hole = playerdetails.Holes[holeNum].Strokes;
@@ -458,7 +406,12 @@ function App() {
     }
     let currentHole = 0;
       if(holeNum > 9){
-        currentHole = playerdetails.Holes[holeNum % 9 - 1];
+        if(holeNum == 18){
+          currentHole = playerdetails.Holes[8];
+        }
+        else{
+          currentHole = playerdetails.Holes[holeNum % 9 - 1];
+        }
       }
       else{
         currentHole = playerdetails.Holes[holeNum - 1];
@@ -468,13 +421,23 @@ function App() {
 
     if(strokes > 0){
       //update weighted score and points
-      const hcpMultiplyer = parseInt(Math.round(playerdetails.Hcp) / 9);
-      const hcpHoles = parseInt(playerdetails.Hcp % 9);
-      if(currentHole.RelativeHcp9 <= hcpHoles){
-        currentHole.HScore = currentHole.Strokes - (1 + hcpMultiplyer);
+      const hcpMultiplyer =  parseInt(playerHcp / 9);
+      const hcpHoles = playerHcp % 9;
+      if(playerHcp <= 9){
+        if(currentHole.RelativeHcp9 <= hcpHoles){
+          currentHole.HScore = currentHole.Strokes - (1 + hcpMultiplyer);
+        }
+        else{
+          currentHole.HScore = currentHole.Strokes;
+        }
       }
       else{
-        currentHole.HScore = currentHole.Strokes;
+        if(currentHole.RelativeHcp9 <= hcpHoles){
+          currentHole.HScore = currentHole.Strokes - (1 + hcpMultiplyer);
+        }
+        else{
+          currentHole.HScore = currentHole.Strokes - 1;
+        }
       }
 
       //gives back a golf number like -1 = birdie, -2 = eagle, 0 = par, 1 = bogey, etc...
@@ -507,6 +470,8 @@ function App() {
     //push state back
     //setRowData(newState)
     console.log('new state: ', golfers);
+
+    CheckSkins(newState);
 
     setTest(test + 1);
     setGolfers(newState);
@@ -542,19 +507,50 @@ function App() {
     setGolfers(newState);
   }
 
+  const CheckSkins = (golfinfo) =>{
+    //need to sort through each person and compare each hole one by one to get the 
+    //min HScore only if there's one we care otherwise dont do anything
+    //calculating how many skins to pay out
+    let SkinDetails = [];
+    golfinfo[0].Holes.filter((item, index) => {
+      const holeIndex = index;
+      let PerHoleSkins = []
+      let currScore = 999;
+      golfinfo.filter(golfer => {
+        if(golfer.Strokes > 0 && golfer.Active == 1){
+          //loop through golfers only if they have a score and are active
+          const HoleData = golfer.Holes[holeIndex];
+          if(HoleData.Strokes > 0){
+            if(HoleData.HScore < currScore){
+              const holeSkinInfo = {PlayerName: golfer.Name, PlayerId: golfer.PlayerNumber, HoleIndex: holeIndex, Hole: HoleData.Hole, Score: HoleData.Strokes, HScore: HoleData.HScore };
+              PerHoleSkins.push(holeSkinInfo);
+              currScore = HoleData.HScore;
+            }
+            else if (HoleData.HScore == currScore){
+              if(PerHoleSkins.length > 0){
+                PerHoleSkins.pop();
+              }
+            }
+          }
+        }
+      });
+
+      if(PerHoleSkins.length == 1){
+        SkinDetails.push(PerHoleSkins);
+        //setTest(test + 1);
+        //setSkinDetails(skindetails.concat(PerHoleSkins));
+      }
+    })
+    console.log("Skin Info: ", skindetails);
+  }
+
   return (
     <div className="App">
       <header className="App-header">
         <LeagueDate weeks={ schedule }></LeagueDate>
-        <WeeklyGolfers people={players} stats={golfers} />  
-
-         Schedule: 
-         <ul>
-           {schedule.map((item, index) => <li key={index}>{item.CourseSide} {item.MatchDate}</li>)}
-         </ul>
-        
         <GolfersToAdd stats={golfers} handleChange={(e) => ReAddPlayer(e)} />
-        <TestRow stats={golfers} handleClick={(e) => handlePlayerMove(e)} handleChange={(e) => handleScoreUpdate(e)}/>
+        <WeeklyGolfers stats={golfers} handleClick={(e) => handlePlayerMove(e)} handleChange={(e) => handleScoreUpdate(e)}/>
+        <Skins stats={golfers} skin={skindetails} />
       </header>
     </div>
   );
