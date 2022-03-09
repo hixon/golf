@@ -34,6 +34,9 @@ const Skins = (props) => {
           const HoleData = golfer.Holes[holeIndex];
           if(HoleData.Strokes > 0){
             if(HoleData.HScore < currScore){
+              if(PerHoleSkins.length > 0){
+                PerHoleSkins.pop();
+              }
               const holeSkinInfo = {PlayerName: golfer.Name, PlayerId: golfer.PlayerNumber, HoleIndex: holeIndex, Hole: HoleData.Hole, Score: HoleData.Strokes, HScore: HoleData.HScore };
               PerHoleSkins.push(holeSkinInfo);
               currScore = HoleData.HScore;
@@ -53,6 +56,15 @@ const Skins = (props) => {
         //setSkinDetails(skindetails.concat(PerHoleSkins));
       }
     })
+
+    let perSkin = 0; 
+    if(SkinDetails.length > 0){
+      perSkin = (toSkins/SkinDetails.length).toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      });
+    }
+    
     console.log("Skin Info: ", SkinDetails);
 
     return (
@@ -60,8 +72,10 @@ const Skins = (props) => {
         <ul>
           <li>Number of golfers: {totalNumberOfGolfers}</li>
           <li>Total money: ${totalMoney} ({totalNumberOfGolfers} * ${proshopMoney} + ${gamblingMoney})</li>
-          <li>$ to Terry: ${toTerry} ({totalNumberOfGolfers} * ${proshopMoney})</li>
-          <li>$ to Teams: ${toTeams} ({totalNumberOfGolfers} * ${gamblingMoney/2})</li>
+          <li>Terry: ${toTerry} ({totalNumberOfGolfers} * ${proshopMoney})</li>
+          <li>Skins: ${toSkins} ({totalNumberOfGolfers} * ${gamblingMoney/2})</li>
+          <li>Per Skin: {perSkin} (${toSkins} / {SkinDetails.length})</li>
+          <li>Blind Teams: ${toTeams} ({totalNumberOfGolfers} * ${gamblingMoney/2})</li>
           <li>1st: ${firstTeam} (60% of ${toTeams})</li>
           <li>2nd: ${secondTeam} (40% of ${toTeams})</li>
         </ul>
