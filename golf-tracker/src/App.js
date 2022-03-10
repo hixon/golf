@@ -2,6 +2,76 @@ import golftracker from './services/api-calls'
 import React, { useState, useEffect } from 'react'
 import './App.css';
 
+const BlindTeams = (props) => {
+  if(props.stats != undefined && props.stats.length > 0){
+    //filter by each team number
+    //and create a new object array that looks like
+    //{Golfer1: x, Golfer2: y, Points1: a, Points2: b, Total: z}...
+
+    const golfers = props.stats;
+
+    let TeamScores = [];
+    let distinctTeams = [];
+    golfers.forEach(item => {
+      if(item.Team > 0){
+        if(!distinctTeams.includes(item.Team)){
+          distinctTeams.push(item.Team);
+          const curr = { Team: item.Team, Golfer1: "", Score1: 0, Golfer2: "", Score2: 0, Total: 0 };
+          TeamScores.push(curr);
+        }
+      }
+    })
+
+    golfers.forEach(golfer => {
+      if(golfer.Strokes > 0 && golfer.Team > 0){
+        let currTeam = TeamScores.find(team => team.Team == golfer.Team);
+        if(currTeam.Golfer1 == ""){
+          //first value for team
+          currTeam.Golfer1 = golfer.Name; 
+          currTeam.Score1 = golfer.TotalPoints;
+          currTeam.Total = currTeam.Score1;
+        }
+        else{
+          //second value for team, find where the team is
+          currTeam.Golfer2 = golfer.Name; 
+          currTeam.Score2 = golfer.TotalPoints;
+          currTeam.Total = currTeam.Score1 + currTeam.Score2;
+        }
+      }
+    })
+
+    return(
+      <table>
+        <thead>
+          <tr>
+            <th>Golfer</th>
+            <th>Points</th>
+            <th>Golfer</th>
+            <th>Points</th>
+            <th>Total Points</th>
+          </tr>
+        </thead>
+        <tbody>
+            {TeamScores.map((item, index) => {
+              return <tr id={item.Team}>
+                <td>{item.Golfer1}</td>
+                <td>{item.Score1}</td>
+                <td>{item.Golfer2}</td>
+                <td>{item.Score2}</td>
+                <td>{item.Total}</td>
+              </tr>
+            })}
+        </tbody>
+      </table>
+    )
+  }
+  else{
+    return (
+      <div></div>
+    )
+  }
+}
+
 const Skins = (props) => {
   if(props.stats != undefined && props.stats.length > 0){
     const totalNumberOfGolfers = props.stats.filter(item => item.Active == 1).length;
@@ -52,8 +122,6 @@ const Skins = (props) => {
 
       if(PerHoleSkins.length == 1){
         SkinDetails.push(PerHoleSkins);
-        //setTest(test + 1);
-        //setSkinDetails(skindetails.concat(PerHoleSkins));
       }
     })
 
@@ -156,23 +224,44 @@ const WeeklyGolfers = (props) => {
     <table>
       <thead>
         <InputHeader headerinfo={props.stats} />
+        <HCPHeader headerinfo={props.stats} />
       </thead>
-        <PlayerRow playerstats={props.stats} handleClick={props.handleClick} handleChange={props.handleChange} />
+        <PlayerRow playerstats={props.stats} handleClick={props.handleClick} handleChange={props.handleChange} handleTeamChange={props.handleTeamChange} />
     </table>
   )
+}
+
+const HCPHeader = (props) => {
+  if(props.headerinfo != undefined && props.headerinfo.length > 0){
+    return(
+      <tr>
+          <th></th><th></th><th>Handicap</th>
+            {props.headerinfo[0].Holes.map((item, index) => {
+              return <th key={index}>{item.RelativeHcp9}</th>
+            }
+            )}
+          <th></th><th></th>
+      </tr>  
+    )
+  }
+  else{
+    return(
+      <div></div>
+    )
+  }
 }
 
 const InputHeader = (props) => {
   if(props.headerinfo != undefined && props.headerinfo.length > 0){
     return(
       <tr>
-          <th></th><th>Name</th><th>Handicap</th>
+          <th></th><th>Name</th><th>Hole #</th>
             {props.headerinfo[0].Holes.map((item, index) => {
               return <th key={index}>{item.Hole}</th>
             }
             )}
           <th>Total<sub>hcp</sub><sup>pts</sup></th><th>Team #</th>
-        </tr>
+      </tr>  
     )
   }
   else{
@@ -197,7 +286,7 @@ const PlayerRow = (props) => {
            <HoleInfo key={index} player={player.PlayerNumber} details={item} handleChange={props.handleChange} /> 
          )}
          <td className="scoreTotals">{player.Strokes}<sub>{player.HStrokes}</sub><sup>{player.TotalPoints}</sup></td>
-         <td><input className="scoreinput"></input></td>
+         <td><input id={player.PlayerNumber} className="scoreinput" onChange={props.handleTeamChange}></input></td>
        </tr> 
       )
       }
@@ -323,13 +412,14 @@ function App() {
     let parscore = 0;
 
     players.map(player => {
-      currdetails.PlayerNumber = player.PlayerNumber
-      currdetails.Name = player.FirstNameLastName
-      currdetails.Hcp = player.CurrentHandicap
-      currdetails.Strokes = 0
-      currdetails.HStrokes = 0
-      currdetails.TotalPoints = 0
-      currdetails.Active = 1
+      currdetails.PlayerNumber = player.PlayerNumber;
+      currdetails.Name = player.FirstNameLastName;
+      currdetails.Hcp = player.CurrentHandicap;
+      currdetails.Strokes = 0;
+      currdetails.HStrokes = 0;
+      currdetails.TotalPoints = 0;
+      currdetails.Active = 1;
+      currdetails.Team = 0;
 
       let holeinfo = []
       courseInfo.TeeBoxes[0].Holes.map((course, index) => {
@@ -430,6 +520,19 @@ function App() {
     else{
       return 0;
     }
+  }
+
+  const handleTeamChange = (event) => {
+    const playerId = event.target.id;
+    const teamNum = parseInt(event.target.value);
+
+    const newState = golfers;
+    const playerdetails = newState.filter(item => item.PlayerNumber == playerId)[0];
+
+    playerdetails.Team = teamNum;
+
+    setTest(test + 1);
+    setGolfers(newState);
   }
 
   const handleScoreUpdate = (event) => {
@@ -593,8 +696,9 @@ function App() {
       <header className="App-header">
         <LeagueDate weeks={ schedule }></LeagueDate>
         <GolfersToAdd stats={golfers} handleChange={(e) => ReAddPlayer(e)} />
-        <WeeklyGolfers stats={golfers} handleClick={(e) => handlePlayerMove(e)} handleChange={(e) => handleScoreUpdate(e)}/>
+        <WeeklyGolfers stats={golfers} handleClick={(e) => handlePlayerMove(e)} handleChange={(e) => handleScoreUpdate(e)} handleTeamChange={(e) => handleTeamChange(e)}/>
         <Skins stats={golfers} />
+        <BlindTeams stats={golfers} />
       </header>
     </div>
   );

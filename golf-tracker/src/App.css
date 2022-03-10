@@ -63,3 +63,7 @@ sub, sup {
   background: black;
   width: 4em;
 }
+
+li{
+  display: flex;
+}
