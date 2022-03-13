@@ -53,7 +53,7 @@ const BlindTeams = (props) => {
         </thead>
         <tbody>
             {TeamScores.map((item, index) => {
-              return <tr id={item.Team}>
+              return <tr key={index}>
                 <td>{item.Golfer1}</td>
                 <td>{item.Score1}</td>
                 <td>{item.Golfer2}</td>
@@ -137,18 +137,26 @@ const Skins = (props) => {
 
     return (
       <div>
-        <ul>
-          <li>Number of golfers: {totalNumberOfGolfers}</li>
-          <li>Total money: ${totalMoney} ({totalNumberOfGolfers} * ${proshopMoney} + ${gamblingMoney})</li>
-          <li>Terry: ${toTerry} ({totalNumberOfGolfers} * ${proshopMoney})</li>
-          <li>Skins: ${toSkins} ({totalNumberOfGolfers} * ${gamblingMoney/2})</li>
-          <li>Per Skin: {perSkin} (${toSkins} / {SkinDetails.length})</li>
-          <li>Blind Teams: ${toTeams} ({totalNumberOfGolfers} * ${gamblingMoney/2})</li>
-          <li>1st: ${firstTeam} (60% of ${toTeams})</li>
-          <li>2nd: ${secondTeam} (40% of ${toTeams})</li>
-        </ul>
+        <table className="table table-striped">
+          <tbody>
+            <tr>
+              <td>Number of golfers: {totalNumberOfGolfers}</td>
+              <td>Skins: ${toSkins} ({totalNumberOfGolfers} * ${gamblingMoney/2})</td>
+              <td>Blind Teams: ${toTeams} ({totalNumberOfGolfers} * ${gamblingMoney/2})</td>
+            </tr>
+            <tr>
+              <td>Total money: ${totalMoney} ({totalNumberOfGolfers} * ${proshopMoney} + ${gamblingMoney})</td>
+              <td>Per Skin: {perSkin} (${toSkins} / {SkinDetails.length})</td>
+              <td>1st: ${firstTeam} (60% of ${toTeams})</td>
+            </tr>
+            <tr>
+              <td>Terry: ${toTerry} ({totalNumberOfGolfers} * ${proshopMoney})</td>
+              <td></td>
+              <td>2nd: ${secondTeam} (40% of ${toTeams})</td>
+            </tr>
+          </tbody>
+        </table>
 
-        Skins
         <table>
           <thead>
             <tr>
@@ -177,8 +185,8 @@ const SkinScores = (props) => {
     console.log("write skins:", props.skins);
     return(
       <tbody>
-      {props.skins.map(item => {
-        return <tr>
+      {props.skins.map((item,index) => {
+        return <tr key={index}>
           <td>{item[0].PlayerName}</td>
           <td>{item[0].Hole}</td>
           <td>{item[0].Score}</td>
@@ -191,8 +199,11 @@ const SkinScores = (props) => {
   }
   else{
     return(
-      <>
-      </>
+      <tbody>
+        <tr>
+          <td>No Skins</td>
+        </tr>
+      </tbody>
     )
   }
 }
@@ -359,6 +370,7 @@ function App() {
   const [ courseside, setCourseSide ] = useState("")
   const [ skindetails, setSkinDetails ] = useState([]);
   const [ test, setTest ] = useState(0);
+  const [ showMoney, setShowMoney ] = useState(false);
   let golferinfo = []
   let holeinfo = []
 
@@ -639,6 +651,12 @@ function App() {
     setGolfers(newState);
   }
 
+  const toggleScores = () => {
+    //flip the display on ScoreInput and MoneyStuff
+    setShowMoney(wasShown => !wasShown);
+    console.log("toggle divs: ", showMoney);
+  }
+
   const ReAddPlayer = (event) => {
     const playerId = event.target[event.target.selectedIndex].id
 
@@ -697,11 +715,34 @@ function App() {
         <LeagueDate weeks={ schedule }></LeagueDate>
         <GolfersToAdd stats={golfers} handleChange={(e) => ReAddPlayer(e)} />
         <WeeklyGolfers stats={golfers} handleClick={(e) => handlePlayerMove(e)} handleChange={(e) => handleScoreUpdate(e)} handleTeamChange={(e) => handleTeamChange(e)}/>
+
         <Skins stats={golfers} />
         <BlindTeams stats={golfers} />
+        
       </header>
     </div>
   );
 }
 
 export default App;
+
+/*
+{
+!showMoney ?
+<div id="ScoreInput">
+<GolfersToAdd stats={golfers} handleChange={(e) => ReAddPlayer(e)} />
+<WeeklyGolfers stats={golfers} handleClick={(e) => handlePlayerMove(e)} handleChange={(e) => handleScoreUpdate(e)} handleTeamChange={(e) => handleTeamChange(e)}/>
+</div>
+: null
+}
+
+{
+showMoney ? 
+<div id="MoneyStuff">
+<Skins stats={golfers} />
+<BlindTeams stats={golfers} />
+</div> : null
+}
+
+<button onClick={(e) => toggleScores()}>See Skins</button>
+*/

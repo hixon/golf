@@ -67,3 +67,7 @@ sub, sup {
 li{
   display: flex;
 }
+
+#MoneyStuff{
+  display: none;
+}
