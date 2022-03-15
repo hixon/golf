@@ -327,7 +327,11 @@ const LeagueDate = (props) => {
 
     const getLeagueDate = (dates) => {
       let previous = ""
-      const today = new Date()
+      const today = new Date();
+      today.setHours(0);
+      today.setMinutes(0);
+      today.setSeconds(0);
+      
       return dates.filter(item => {
         const curr = new Date(item.MatchDate)
         if(curr === today){
