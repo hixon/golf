@@ -327,23 +327,32 @@ const LeagueDate = (props) => {
 
     const getLeagueDate = (dates) => {
       let previous = ""
-      const today = new Date();
-      today.setHours(0);
-      today.setMinutes(0);
-      today.setSeconds(0);
-      
-      return dates.filter(item => {
+    const today = new Date()
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);
+
+    //today.setDate(today.getDate() + 6);
+    return dates.filter((item, index) => {
         const curr = new Date(item.MatchDate)
-        if(curr === today){
-          return item.MatchDate
-        }
-        else if (today > previous && today < curr){
-          return item.MatchDate
+        let next;
+        if(index < dates.length - 1){
+          next = new Date(dates[index + 1].MatchDate);
         }
         else{
-          previous = curr
+          next = new Date(dates[index].MatchDate);
         }
-      })
+        if(curr === today){
+          return item.MatchDate;
+        }
+        else if (today > previous && today < next){
+          return item.MatchDate;
+        }
+        else{
+          previous = curr;          
+        }
+    })
     }
 
     const side = getLeagueDate(props.weeks)[0].CourseSide == 1? "Front" : "Back"
@@ -490,17 +499,30 @@ function App() {
   const getSideFromDate = (dates) => {
     let previous = ""
     const today = new Date()
-    return dates.filter(item => {
-      const curr = new Date(item.MatchDate)
-      if(curr === today){
-        return item.MatchDate
-      }
-      else if (today > previous && today < curr){
-        return item.MatchDate
-      }
-      else{
-        previous = curr
-      }
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);
+
+    //today.setDate(today.getDate() + 6);
+    return dates.filter((item, index) => {
+        const curr = new Date(item.MatchDate)
+        let next;
+        if(index < dates.length - 1){
+          next = new Date(dates[index + 1].MatchDate);
+        }
+        else{
+          next = new Date(dates[index].MatchDate);
+        }
+        if(curr === today){
+          return item.MatchDate;
+        }
+        else if (today > previous && today < next){
+          return item.MatchDate;
+        }
+        else{
+          previous = curr;          
+        }
     })
   }
 
@@ -737,7 +759,7 @@ export default App;
 <GolfersToAdd stats={golfers} handleChange={(e) => ReAddPlayer(e)} />
 <WeeklyGolfers stats={golfers} handleClick={(e) => handlePlayerMove(e)} handleChange={(e) => handleScoreUpdate(e)} handleTeamChange={(e) => handleTeamChange(e)}/>
 </div>
-: null
+: <></>
 }
 
 {
@@ -745,7 +767,7 @@ showMoney ?
 <div id="MoneyStuff">
 <Skins stats={golfers} />
 <BlindTeams stats={golfers} />
-</div> : null
+</div> : <></>
 }
 
 <button onClick={(e) => toggleScores()}>See Skins</button>
