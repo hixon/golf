@@ -327,12 +327,12 @@ const LeagueDate = (props) => {
 
     const getLeagueDate = (dates) => {
       let previous = ""
-    //const today = new Date()
-    //today.setHours(0);
-    //today.setMinutes(0);
-    //today.setSeconds(0);
-    //today.setMilliseconds(0);
-    const today = new Date(2022, 4, 9);
+    const today = new Date()
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);
+    //const today = new Date(2022, 4, 9);
 
     //today.setDate(today.getDate() + 6);s
     return dates.filter((item, index) => {
