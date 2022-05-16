@@ -327,13 +327,14 @@ const LeagueDate = (props) => {
 
     const getLeagueDate = (dates) => {
       let previous = ""
-    const today = new Date()
-    today.setHours(0);
-    today.setMinutes(0);
-    today.setSeconds(0);
-    today.setMilliseconds(0);
+    //const today = new Date()
+    //today.setHours(0);
+    //today.setMinutes(0);
+    //today.setSeconds(0);
+    //today.setMilliseconds(0);
+    const today = new Date(2022, 4, 9);
 
-    //today.setDate(today.getDate() + 6);
+    //today.setDate(today.getDate() + 6);s
     return dates.filter((item, index) => {
         const curr = new Date(item.MatchDate)
         let next;
@@ -498,11 +499,12 @@ function App() {
   
   const getSideFromDate = (dates) => {
     let previous = ""
-    const today = new Date()
-    today.setHours(0);
-    today.setMinutes(0);
-    today.setSeconds(0);
-    today.setMilliseconds(0);
+    //const today = new Date()
+    //today.setHours(0);
+    //today.setMinutes(0);
+    //today.setSeconds(0);
+    //today.setMilliseconds(0);
+    const today = new Date(2022, 4, 9);
 
     //today.setDate(today.getDate() + 6);
     return dates.filter((item, index) => {
@@ -608,6 +610,7 @@ function App() {
       //update weighted score and points
       const hcpMultiplyer =  parseInt(playerHcp / 9);
       const hcpHoles = playerHcp % 9;
+
       if(playerHcp <= 9){
         if(currentHole.RelativeHcp9 <= hcpHoles){
           currentHole.HScore = currentHole.Strokes - (1 + hcpMultiplyer);
@@ -619,6 +622,9 @@ function App() {
       else{
         if(currentHole.RelativeHcp9 <= hcpHoles){
           currentHole.HScore = currentHole.Strokes - (1 + hcpMultiplyer);
+        }
+        else if (hcpHoles == 0 && hcpMultiplyer > 0){  //case when person hcp is a multiple of nine
+          currentHole.HScore = currentHole.Strokes - hcpMultiplyer;
         }
         else{
           currentHole.HScore = currentHole.Strokes - 1;
