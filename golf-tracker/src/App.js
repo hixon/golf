@@ -332,7 +332,7 @@ const LeagueDate = (props) => {
     today.setMinutes(0);
     today.setSeconds(0);
     today.setMilliseconds(0);
-    //const today = new Date(2022, 4, 9);
+    //const today = new Date(2022, 4, 10);
 
     //today.setDate(today.getDate() + 6);s
     return dates.filter((item, index) => {
@@ -357,6 +357,9 @@ const LeagueDate = (props) => {
     }
 
     const side = getLeagueDate(props.weeks)[0].CourseSide == 1? "Front" : "Back"
+    //in the return statement we need to change this to a drop down for side
+    //we dont really need to care about pulling the right side each week in case something
+    //changes. once this drop down is selected we should updated everything. 
     return (
       <div>
         <p>WWGC 2022</p>
@@ -422,6 +425,7 @@ function App() {
     if(schedule.length > 0){
       const courseside = getSideFromDate(schedule)[0].CourseSide == 1? "Front" : "Back"
       setCourseSide(courseside)
+      //setCourseSide(selectedCourseSide);
       console.log("8 course info actually")
       golftracker
       .courseinfo(st, schedule[0].Course.CourseNumber)
@@ -498,13 +502,16 @@ function App() {
   }, [courseInfo])
   
   const getSideFromDate = (dates) => {
+    //this method just gets a text representation of what the date is for the league
+    //this really does not matter
+
     let previous = ""
-    //const today = new Date()
-    //today.setHours(0);
-    //today.setMinutes(0);
-    //today.setSeconds(0);
-    //today.setMilliseconds(0);
-    const today = new Date(2022, 4, 9);
+    const today = new Date()
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);
+    //const today = new Date(2022, 4, 10);
 
     //today.setDate(today.getDate() + 6);
     return dates.filter((item, index) => {
@@ -612,7 +619,10 @@ function App() {
       const hcpHoles = playerHcp % 9;
 
       if(playerHcp <= 9){
-        if(currentHole.RelativeHcp9 <= hcpHoles){
+        if(playerHcp == 9){
+          currentHole.HScore = currentHole.Strokes - 1;
+        }
+        else if(currentHole.RelativeHcp9 <= hcpHoles){
           currentHole.HScore = currentHole.Strokes - (1 + hcpMultiplyer);
         }
         else{
