@@ -5,6 +5,7 @@ const baseurl = 'https://golfleaguetracker.com/gltwebapi'
 //sub pages
 const login = '/Login'
 const player = '/Player'
+const hcp = '/Handicap'
 const schedule = '/Schedule'
 const score = '/Score'
 const course = '/Course'
@@ -40,9 +41,15 @@ const courseinfo = (token, courseNumber) => {
     return axios.get(baseurl + course + `/GetCourse?st=${token}&courseNumber=${courseNumber}`)
 }
 
+const handicap = (token, courseNumber, leagueId) => {
+    return axios.get(baseurl + hcp + `/GetPlayerCourseHandicaps?st=${token}&filter.courseNumber=${courseNumber}&filter.gender=1&filter.leagueId=${leagueId}`)
+}
+
+
 export default{
     authenticate, 
     players, 
     sched, 
-    courseinfo
+    courseinfo, 
+    handicap
 }

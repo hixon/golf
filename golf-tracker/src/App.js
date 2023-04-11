@@ -370,18 +370,19 @@ const LeagueDate = (props) => {
 function App() {
   //COURSE SIDES: 1 - FRONT, 2 - BACK
 
-  const [ players, setPlayers ] = useState([])
-  const [ schedule, setSchedule ] = useState([])
-  const [ courseInfo, setCourseInfo ] = useState([])
-  const [ st, setST ] = useState("")
-  const [ leagueDate, setLeagueDate ] = useState("")
-  const [ golfers, setGolfers ] = useState([])
-  const [ courseside, setCourseSide ] = useState("")
+  const [ players, setPlayers ] = useState([]);
+  const [ handicap, setHandicap ] = useState([]);
+  const [ schedule, setSchedule ] = useState([]);
+  const [ courseInfo, setCourseInfo ] = useState([]);
+  const [ st, setST ] = useState("");
+  const [ leagueDate, setLeagueDate ] = useState("");
+  const [ golfers, setGolfers ] = useState([]);
+  const [ courseside, setCourseSide ] = useState("");
   const [ skindetails, setSkinDetails ] = useState([]);
   const [ test, setTest ] = useState(0);
   const [ showMoney, setShowMoney ] = useState(false);
-  let golferinfo = []
-  let holeinfo = []
+  let golferinfo = [];
+  let holeinfo = [];
 
   //login initially to get an access token
   //token will be used later for other web api calls
@@ -408,6 +409,16 @@ function App() {
           console.log("6 save schedule", response.data.ReportData)
           setSchedule(response.data.ReportData)
         })
+
+        //courseNumber=23145&
+        //leagueId 14350
+        console.log("5b get player handicap: ", atoken)
+        golftracker
+        .handicap(atoken, '23145', '14350')
+        .then(response => {
+          console.log("5bb save player handicap info", response.data.ReportData)
+          setHandicap(response.data.ReportData)
+        })
       })
       
   }, [])
@@ -433,10 +444,24 @@ function App() {
     let currdetails = {};
     let parscore = 0;
 
+    let hcpInfo;
+
+    if(handicap.length > 0){
+      hcpInfo = handicap;  
+    }
+
     players.map(player => {
       currdetails.PlayerNumber = player.PlayerNumber;
       currdetails.Name = player.FirstNameLastName;
-      currdetails.Hcp = player.CurrentHandicap;
+      //currdetails.FrontHcp = handicap.find(item => item.PlayerName.PlayerNumber == currdetails.PlayerNumber).TeeBoxRating.CourseHandicapFront;
+      //currdetails.BackHcp = handicap.find(item => item.PlayerName.PlayerNumber == currdetails.PlayerNumber).TeeBoxRating.CourseHandicapBack;
+      //currdetails.Hcp = player.CurrentHandicap; //change for CourseHandicap, from CurrentHandicap so it shows the side hcp
+      if(courseside == "Front"){
+        currdetails.Hcp = handicap.find(item => item.PlayerName.PlayerNumber == currdetails.PlayerNumber).TeeBoxRating.CourseHandicapFront;
+      }
+      else{
+        currdetails.Hcp = handicap.find(item => item.PlayerName.PlayerNumber == currdetails.PlayerNumber).TeeBoxRating.CourseHandicapBack;
+      }
       currdetails.Strokes = 0;
       currdetails.HStrokes = 0;
       currdetails.TotalPoints = 0;
@@ -457,7 +482,7 @@ function App() {
             hole.Strokes = 0
             hole.RelativeHcp9 = course.RelativeDifficulty9
             hole.RelativeHcp18 = course.RelativeDifficulty18
-            hole.Par = course.Par
+            hole.Par = course.HolePar
             hole.Skin = 0
   
             holeinfo.push(hole)
@@ -474,7 +499,7 @@ function App() {
             hole.Strokes = 0
             hole.RelativeHcp9 = course.RelativeDifficulty9
             hole.RelativeHcp18 = course.RelativeDifficulty18
-            hole.Par = course.Par
+            hole.Par = course.HolePar
             hole.Skin = 0
   
             holeinfo.push(hole)
@@ -498,12 +523,16 @@ function App() {
     //this really does not matter
 
     let previous = ""
-    const today = new Date()
+    /*const today = new Date()
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);*/
+    const today = new Date(2023, 4, 4);
     today.setHours(0);
     today.setMinutes(0);
     today.setSeconds(0);
     today.setMilliseconds(0);
-    //const today = new Date(2022, 4, 10);
 
     //today.setDate(today.getDate() + 6);
     return dates.filter((item, index) => {
@@ -520,6 +549,44 @@ function App() {
         }
         else if (today > previous && today < next){
           return item.MatchDate;
+        }
+        else{
+          previous = curr;          
+        }
+    })
+  }
+
+  const getScheduleDetails = (dates) => {
+    //this method just gets a text representation of what the date is for the league
+    //this really does not matter
+
+    let previous = ""
+    /*const today = new Date()
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);*/
+    const today = new Date(2023, 4, 4);
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);
+
+    //today.setDate(today.getDate() + 6);
+    dates.filter((item, index) => {
+        const curr = new Date(item.MatchDate)
+        let next;
+        if(index < dates.length - 1){
+          next = new Date(dates[index + 1].MatchDate);
+        }
+        else{
+          next = new Date(dates[index].MatchDate);
+        }
+        if(curr === today){
+          return item.Schedule;
+        }
+        else if (today > previous && today < next){
+          return item.Schedule;
         }
         else{
           previous = curr;          
