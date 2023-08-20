@@ -60,7 +60,7 @@ sub, sup {
 }
 
 .scoreTotals{
-  background: black;
+  background: white;
   width: 4em;
 }
 
@@ -70,4 +70,37 @@ li{
 
 #MoneyStuff{
   display: none;
+}
+
+.card {
+  border-radius: 8px;
+  border-color: black;
+  border-style: solid;
+}
+
+.hcprow {
+  background-color: grey;
+  color: white;
+}
+
+.parrow {
+  background-color: green;
+}
+
+.holerow {
+  background-color: olive;
+  color: white;
+} 
+
+.cardrow {
+  background-color: white;
+  color: black;
+}
+
+.score {
+  width: 43px;
+  height: 31px;
+  border: none;
+  font-size: 24px;
+  text-align: center;
 }

@@ -1,0 +1,46 @@
+[
+    {
+        "PlayerNumber":1,
+        "Name":"Ryan Hixon",
+        "Hcp":5,
+        "Strokes":0,
+        "HStrokes":0,
+        "TotalPoints":0,
+        "Active":1,
+        "Team":0,
+        "ParScore":34,
+        "Holes":[
+            { "Hole":10,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":5,"RelativeHcp18":10,"Par":4,"Skin":0 },
+            { "Hole":11,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":3,"RelativeHcp18":6,"Par":3,"Skin":0 },
+            { "Hole":12,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":6,"RelativeHcp18":12,"Par":4,"Skin":0 },
+            { "Hole":13,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":7,"RelativeHcp18":14,"Par":4,"Skin":0 },
+            { "Hole":14,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":9,"RelativeHcp18":18,"Par":3,"Skin":0 },
+            { "Hole":15,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":8,"RelativeHcp18":16,"Par":3,"Skin":0 },
+            { "Hole":16,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":1,"RelativeHcp18":2,"Par":5,"Skin":0 },
+            { "Hole":17,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":4,"RelativeHcp18":8,"Par":4,"Skin":0 },
+            { "Hole":18,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":2,"RelativeHcp18":4,"Par":4,"Skin":0 }
+        ]
+    },
+    {
+        "PlayerNumber":2,
+        "Name":"Sal Gori",
+        "Hcp":2,
+        "Strokes":0,
+        "HStrokes":0,
+        "TotalPoints":0,
+        "Active":1,
+        "Team":0,
+        "ParScore":34,
+        "Holes":[
+            { "Hole":10,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":5,"RelativeHcp18":10,"Par":4,"Skin":0 },
+            { "Hole":11,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":3,"RelativeHcp18":6,"Par":3,"Skin":0 },
+            { "Hole":12,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":6,"RelativeHcp18":12,"Par":4,"Skin":0 },
+            { "Hole":13,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":7,"RelativeHcp18":14,"Par":4,"Skin":0 },
+            { "Hole":14,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":9,"RelativeHcp18":18,"Par":3,"Skin":0 },
+            { "Hole":15,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":8,"RelativeHcp18":16,"Par":3,"Skin":0 },
+            { "Hole":16,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":1,"RelativeHcp18":2,"Par":5,"Skin":0 },
+            { "Hole":17,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":4,"RelativeHcp18":8,"Par":4,"Skin":0 },
+            { "Hole":18,"Score":0,"HScore":0,"Points":0,"Strokes":0,"RelativeHcp9":2,"RelativeHcp18":4,"Par":4,"Skin":0 }
+        ]
+    }
+] 
